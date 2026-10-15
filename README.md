@@ -59,9 +59,6 @@ pdflatex -interaction=nonstopmode apresentacao_desafio08.tex
 pdflatex -interaction=nonstopmode apresentacao_desafio08.tex   # 2ª passada
 ```
 
-Ferramentas usadas nesta máquina: **TinyTeX em `/home/matheus/.TinyTeX`** (instalação
-no espaço do usuário, sem `sudo`). Para recompilar em outro computador:
-
 ```bash
 # opção A: TeX Live do sistema
 sudo apt install texlive-latex-recommended texlive-fonts-recommended \
