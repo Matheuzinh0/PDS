@@ -26,10 +26,6 @@ python3 -m venv .venv_pds
 .venv_pds/bin/python src/gerar_slides.py
 ```
 
-> **Nesta máquina o ambiente já está pronto em `/home/matheus/.venv_pds`.**
-> Basta trocar `.venv_pds/bin/python` por `/home/matheus/.venv_pds/bin/python`
-> nos comandos acima.
-
 ## 2. Arquivos
 
 | Arquivo | Conteúdo |
