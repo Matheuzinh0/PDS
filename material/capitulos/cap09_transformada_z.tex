@@ -1,0 +1,120 @@
+% =============================================================================
+\section{Transformada $Z$: ROC, inversa e estabilidade}\label{sec:z}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\[
+  X(z)=\sum_{n=-\infty}^{\infty}x[n]z^{-n},\qquad z\in\mathbb{C},\qquad
+  x[n]=\frac{1}{2\pi j}\oint X(z)z^{n-1}dz .
+\]
+A transformada só está definida junto com sua \textbf{região de convergência
+(ROC)}: anéis do plano $z$ delimitados pelos polos. Pares essenciais:
+\[
+  \delta[n]\leftrightarrow1\ (\text{todo }z),\qquad
+  u[n]\leftrightarrow\frac{1}{1-z^{-1}},\ |z|>1,
+\]
+\[
+  \alpha^nu[n]\leftrightarrow\frac{1}{1-\alpha z^{-1}},\ |z|>|\alpha|,
+  \qquad
+  -\alpha^nu[-n-1]\leftrightarrow\frac{1}{1-\alpha z^{-1}},\ |z|<|\alpha| .
+\]
+Note: \emph{a mesma expressão algébrica} corresponde a duas sequências
+diferentes, dependendo da ROC. Propriedades úteis:
+\[
+  x[n-n_0]\leftrightarrow z^{-n_0}X(z),\qquad
+  x_1[n]*x_2[n]\leftrightarrow X_1(z)X_2(z).
+\]
+
+\begin{teo}[causalidade e estabilidade no plano $z$]
+Para um sistema causal, a ROC é $|z|>|p|_{\max}$. O sistema é
+\textbf{BIBO estável} $\iff$ a ROC contém o \textbf{círculo unitário}
+$|z|=1$. Logo, um sistema causal é estável $\iff$ \textbf{todos os polos têm
+$|p_i|<1$}.
+\end{teo}
+
+\paragraph{Transformada inversa por frações parciais.} Escreva
+$X(z)=\sum_i\frac{A_i}{1-p_iz^{-1}}$ (polos simples). Então
+\[
+  x[n]=\sum_i A_i\,p_i^{\,n}u[n]\quad\text{(se ROC ``para fora'')}.
+\]
+Atalho prático para $X(z)$ de ordem igual no numerador e denominador:
+expanda $X(z)/z$ e use
+$A_i=\left.(1-p_iz^{-1})X(z)\right|_{z=p_i}$.
+
+\paragraph{Atraso e implementação.} $z^{-1}$ é o \textbf{operador de atraso
+unitário}: cada $z^{-1}$ no numerador/denominador é uma amostra de memória. É
+essa a ponte entre $H(z)$ e o fluxograma de implementação (Capítulo~\ref{sec:estr}).
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 9.1
+\exer{Calcule $X(z)$ e a ROC de $x[n]=(1/2)^nu[n]$; localize polos e zeros.}
+
+\textbf{Solução.} Soma geométrica:
+\[
+  X(z)=\sum_{n\ge0}\left(\tfrac12 z^{-1}\right)^{n}
+      =\frac{1}{1-\tfrac12z^{-1}}=\frac{z}{z-\tfrac12},\qquad
+  |z|>\tfrac12 .
+\]
+Polo em $z=1/2$; zero em $z=0$. Como a ROC contém $|z|=1$, o sistema é
+estável. Verificação: $\sum_n|h[n]|=\sum(1/2)^n=2<\infty$.
+
+\resp{$X(z)=\dfrac{z}{z-1/2}$, ROC $|z|>1/2$, polo em $0{,}5$ e zero na
+origem.}
+
+% ---------------------------------------------------------------- 9.2
+\exer{Determine $x[n]$ (causal) para $X(z)=\dfrac{z^2}{(z-1/2)(z-1/4)}$.}
+
+\textbf{Solução.} Dividindo por $z$:
+\[
+  \frac{X(z)}{z}=\frac{z}{(z-1/2)(z-1/4)}
+  =\frac{A}{z-1/2}+\frac{B}{z-1/4},
+\]
+\[
+  A=\frac{1/2}{1/2-1/4}=2,\qquad
+  B=\frac{1/4}{1/4-1/2}=-1 .
+\]
+Logo $X(z)=\dfrac{2z}{z-1/2}-\dfrac{z}{z-1/4}$ e, para a ROC $|z|>1/2$
+(causal),
+\[
+  x[n]=\left[2\left(\tfrac12\right)^{n}-\left(\tfrac14\right)^{n}\right]u[n].
+\]
+Valores: $x[0..5]=\{1;\ 0{,}75;\ 0{,}4375;\ 0{,}234375;\ 0{,}12109375;\
+0{,}06152344\}$ — checagem imediata: $x[0]=1$ porque o numerador e o
+denominador têm a mesma ordem em $z$.
+
+\resp{$x[n]=\left[2(1/2)^n-(1/4)^n\right]u[n]$, com $x[0]=1$ e $x[1]=0{,}75$.}
+
+% ---------------------------------------------------------------- 9.3
+\exer{Para $X(z)=\dfrac{1}{(1-\frac12z^{-1})(1-2z^{-1})}$, discuta as três
+possíveis ROCs quanto a causalidade e estabilidade.}
+
+\textbf{Solução.} Polos em $z=1/2$ e $z=2$. As ROCs possíveis (anéis
+delimitados por polos) são:
+
+\begin{center}
+\small
+\begin{tabular}{llll}
+\toprule
+ROC & Sequência & Causal? & Estável?\\
+\midrule
+$|z|>2$ & $x[n]=\bigl[-\frac13(\frac12)^n+\frac43\,2^{n}\bigr]u[n]$
+        & sim & \textbf{não} (fora $|z|=1$)\\
+$\frac12<|z|<2$ & $x[n]=-\frac13(\frac12)^nu[n]-\frac43\,2^nu[-n-1]$
+        & \textbf{não} & \textbf{sim} (contém $|z|=1$)\\
+$|z|<\frac12$ & $x[n]=\bigl[\frac13(\frac12)^n+\frac43\,2^n\bigr]u[-n-1]$ & não & não\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Decomposição em frações parciais (usada na tabela):
+\[
+  X(z)=\frac{-1/3}{1-\frac12z^{-1}}+\frac{4/3}{1-2z^{-1}},
+  \qquad
+  \text{checagem: } X(1)=-\tfrac13\cdot2+\tfrac43\cdot(-1)=-2 \ \checkmark
+\]
+
+\resp{A única ROC estável é $\frac12<|z|<2$, que corresponde a um sistema
+\emph{não-causal}. Querer causal e estável ao mesmo tempo seria impossível —
+é exatamente a situação do canal $H(z)=1-2z^{-1}$ do Desafio 04.}

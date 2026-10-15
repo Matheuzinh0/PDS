@@ -1,0 +1,103 @@
+% =============================================================================
+\section{TDFT, DFT/FFT, janelamento e resolução espectral}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\paragraph{TDFT (DTFT).} Para uma sequência de duração finita ou estável,
+\[
+  X(e^{j\omega})=\sum_{n=-\infty}^{\infty}x[n]e^{-j\omega n},
+  \qquad X(e^{j\omega})\ \text{é periódica em }\omega\ \text{com período }2\pi .
+\]
+Simetrias (para $x[n]$ real): $|X|$ é par e a fase é ímpar — por isso basta
+desenhar $\omega\in[0,\pi]$.
+
+\paragraph{DFT.} Amostrando a TDFT em $N$ pontos igualmente espaçados:
+\[
+  X[k]=X(e^{j\omega})\Big|_{\omega=2\pi k/N}
+       =\sum_{n=0}^{N-1}x[n]e^{-j2\pi kn/N},\qquad k=0,\dots,N-1 .
+\]
+A FFT é apenas um algoritmo $O(N\log N)$ para a mesma DFT. Duas frequências
+``escalas'' diferentes:
+\[
+  \Delta\omega=\frac{2\pi}{N}\ \text{rad/amostra},\qquad
+  \Delta f=\frac{F_s}{N}\ \text{Hz}\ (\textbf{resolução}) .
+\]
+
+\paragraph{Leakage (vazamento).} A DFT supõe periodicidade de período $N$. Se
+a sequência não contém um número \emph{inteiro} de ciclos dentro das $N$
+amostras, a descontinuidade na emenda espalha energia por todos os bins —
+\textbf{leakage}. Soluções: escolher $N$ inteiro de ciclos, ou aplicar uma
+\textbf{janela} (Capítulo~\ref{sec:fir}).
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Janela & 1º lóbulo lateral & largura do lóbulo principal\\
+\midrule
+Retangular & $-13{,}25$ dB & $2{,}00$ bins\\
+Hann        & $-31{,}47$ dB & $4{,}06$ bins\\
+Hamming     & $-43{,}59$ dB & $4{,}14$ bins\\
+Blackman    & $-58{,}11$ dB & $6{,}09$ bins\\
+\bottomrule
+\end{tabular}
+\end{center}
+(valores medidos numericamente; largura em bins de uma DFT de comprimento
+$L=65$.) Regra de ouro: \textbf{janela boa em lóbulo lateral paga com lóbulo
+principal largo}; a largura cresce $\sim1/L$ para todas.
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 11.1
+\exer{Calcule a DFT de $x[n]=1$ para $n=0,\dots,63$ (pulso retangular
+discreto) e discuta o resultado.}
+
+\textbf{Solução.}
+\[
+  X[k]=\sum_{n=0}^{63}e^{-j2\pi kn/64}=
+  \frac{1-e^{-j2\pi k}}{1-e^{-j2\pi k/64}}
+  =
+  \begin{cases}64,&k=0\\0,&k=1,\dots,63\end{cases}
+\]
+pois o numerador se anula para todo $k$ inteiro não múltiplo de 64. Resultado
+calculado: $|X[0]|=64$ e $|X[k]|\approx0$ (numericamente $\sim10^{-14}$).
+
+\resp{$X[0]=64$ (soma dos valores), todos os outros bins nulos: a DFT de um
+retângulo ``completo'' é um impulso em $k=0$ — sem leakage, porque o sinal
+fecha exatamente um período da DFT.}
+
+% ---------------------------------------------------------------- 11.2
+\exer{Uma senoide de $1{,}5$ ciclos é analisada com $N=64$ pontos. Estime os
+três maiores bins e explique o efeito.}
+
+\textbf{Solução.} A frequência está entre os bins $k=1$ e $k=2$ (meio bin de
+cada lado). Calculando a DFT:
+\[
+  |X[2]|=23{,}2708,\qquad |X[1]|=16{,}3445,\qquad |X[3]|=9{,}0603 .
+\]
+Nenhum bin é nulo, ao contrário do caso 11.1: é \textbf{leakage}. A energia
+``espalha'' nos bins vizinhos (e, mais fracamente, por toda a faixa) com
+decaimento proporcional ao lóbulo lateral da janela retangular
+($-13{,}25$ dB).
+
+\resp{Bins $k=1,2,3$ com magnitudes $16{,}34$, $23{,}27$ e $9{,}06$ —
+leakage causado pela descontinuidade na emenda entre $x[63]$ e $x[0]$.}
+
+% ---------------------------------------------------------------- 11.3
+\exer{Com $F_s=1000$ Hz, quantas amostras $N$ são necessárias para
+\emph{resolver} dois tons separados de $10$ Hz? E qual janela usar?}
+
+\textbf{Solução.} A resolução é $\Delta f=F_s/N$. Para separar dois tons é
+preciso $\Delta f\le10$ Hz:
+\[
+  \frac{1000}{N}\le10\ \Rightarrow\ N\ge100\ \text{amostras}
+  \qquad(\text{ou seja, }10\ \text{ms de sinal}).
+\]
+Sobre a janela: a retangular ``resolveria'' no limite ($\Delta f=10$ Hz), mas
+com lóbulos laterais de $-13$ dB que podem mascarar o tom fraco; a Hamming
+($-43{,}59$ dB) é a escolha de compromisso usual — ela alarga o lóbulo
+principal para $\sim4$ bins, exigindo $N\gtrsim400$ para a mesma separação
+prática.
+
+\resp{$N\ge100$ amostras ($\Delta f=10$ Hz); na prática use $N\ge400$ com
+janela de Hamming para separar de verdade (4 bins de lóbulo principal).}

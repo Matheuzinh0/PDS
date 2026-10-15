@@ -1,0 +1,149 @@
+% =============================================================================
+\section{Fase, atraso de grupo, filtros passa-tudo e fase mínima}\label{sec:fase}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+Escrevendo $H(e^{j\omega})=|H(e^{j\omega})|e^{j\phi(\omega)}$:
+
+\[
+  \text{atraso de fase: } \tau_\phi(\omega)=-\frac{\phi(\omega)}{\omega},
+  \qquad
+  \boxed{\ \text{atraso de grupo: } \tau(\omega)=-\frac{d\phi(\omega)}{d\omega}\ }
+\]
+$\tau$ (em amostras) mede o \textbf{atraso do envelope} em cada frequência. Se
+$\tau(\omega)$ não for constante, um pulso se \emph{dispersa} (distorção de
+fase) mesmo com $|H|$ constante.
+
+\paragraph{Resultado-chave para sistemas de 1ª ordem.} Para
+$H(z)=\dfrac{1-bz^{-1}}{1-az^{-1}}$ (com $a,b$ reais e $|a|<1$):
+\[
+  \arg H(e^{j\omega})=\arg(e^{j\omega}-b)-\arg(e^{j\omega}-a),\qquad
+  \frac{d}{d\omega}\arg\bigl(e^{j\omega}-p\bigr)
+  =\frac{1-p\cos\omega}{1-2p\cos\omega+p^{2}},
+\]
+logo
+\[
+  \boxed{\
+  \tau(\omega)=\frac{1-a\cos\omega}{1-2a\cos\omega+a^{2}}
+  -\frac{1-b\cos\omega}{1-2b\cos\omega+b^{2}}\ }
+\]
+
+\paragraph{Filtro passa-tudo de 1ª ordem.} $H_{ap}(z)=\dfrac{-a+z^{-1}}{1-az^{-1}}$
+tem $|H_{ap}|=1$ e
+\[
+  \tau_{ap}(\omega)=\frac{1-a^{2}}{1-2a\cos\omega+a^{2}}\ \ge\ 0,
+\]
+com máximo em $\omega=0$ igual a $\dfrac{1+a}{1-a}$ e mínimo em $\omega=\pi$.
+Note que $\tau_{ap}$ é \emph{limitado}: para $|\omega|$ grande não se consegue
+adicionar atraso arbitrariamente — é a razão pela qual certos alvos de
+equalização são \textbf{inalcançáveis} (Exercício 12.2).
+
+\paragraph{Decomposição fase mínima $\times$ passa-tudo.} Todo sistema racional
+se escreve
+\[
+  H(z)=\underbrace{H_{\min}(z)}_{\text{zeros e polos dentro do círculo}}
+  \underbrace{H_{ap}(z)}_{\text{passa-tudo}},
+  \qquad |H_min|=|H| .
+\]
+Um zero $z_0$ com $|z_0|>1$ é ``espelhado'' para $1/z_0^*$ (fase mínima) e a
+diferença vira passa-tudo. Consequência energética: \emph{com o mesmo módulo
+de resposta em frequência}, o sistema de fase mínima concentra mais energia
+nos primeiros instantes: para qualquer $N$,
+\[
+  \sum_{n=0}^{N}|h_{\min}[n]|^{2}\ \ge\ \sum_{n=0}^{N}|h[n]|^{2}
+  \quad(\text{e as energias totais são iguais}).
+\]
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 12.1
+\exer{\textbf{(canal do Desafio 02)} $H_c(z)=\dfrac{1-0{,}4z^{-1}}{1-0{,}85z^{-1}}$.
+Deduza $\tau_c(\omega)$ e calcule em $\omega=0$, $\pi/2$ e $\pi$.}
+
+\textbf{Solução.} Usando a fórmula deduzida acima com $a=0{,}85$ e $b=0{,}4$:
+\[
+  \tau_c(\omega)=\frac{1-0{,}85\cos\omega}{1-1{,}7\cos\omega+0{,}7225}
+  -\frac{1-0{,}4\cos\omega}{1-0{,}8\cos\omega+0{,}16}.
+\]
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+$\omega$ & $\tau_c$ analítico (amostras) & derivada numérica & parte do polo / do zero\\
+\midrule
+$0$      & $5{,}000000$ & $5{,}000000$ & $6{,}6667-1{,}6667$\\
+$\pi/2$  & $-0{,}281517$ & $-0{,}281517$ & $0{,}5806-0{,}8621$\\
+$\pi$    & $-0{,}173745$ & $-0{,}173745$ & $0{,}5405-0{,}7143$\\
+\bottomrule
+\end{tabular}
+\end{center}
+A concordância entre a fórmula fechada e a derivada numérica da fase
+($h=10^{-8}$) é de $10^{-8}$. Note que $\tau_c$ é \textbf{negativo} em
+$\pi/2$: o canal \emph{avança} o envelope ali.
+
+\resp{$\tau_c(0)=5{,}0$; $\tau_c(\pi/2)=-0{,}281517$;
+$\tau_c(\pi)=-0{,}173745$ amostras.}
+
+% ---------------------------------------------------------------- 12.2
+\exer{Coloque em série com $H_c(z)$ do exercício anterior o passa-tudo
+$H_{eq}(z)=\dfrac{-a+z^{-1}}{1-az^{-1}}$, com $a\in\mathbb{R}$.
+(a) Determine $a$ para que $\tau_{tot}(0)=10$ amostras.
+(b) É possível obter $\tau_{tot}(\pi/2)=3{,}5$? Justifique.}
+
+\textbf{Solução.} $\tau_{tot}(\omega)=\tau_c(\omega)+\tau_{ap}(\omega)$.
+Em $\omega=0$: $\tau_c(0)=5$ e
+\[
+  \tau_{ap}(0)=\frac{1-a^{2}}{(1-a)^{2}}=\frac{(1-a)(1+a)}{(1-a)^{2}}
+            =\frac{1+a}{1-a}.
+\]
+Então
+\[
+  5+\frac{1+a}{1-a}=10\ \Longrightarrow\ \frac{1+a}{1-a}=5
+  \ \Longrightarrow\ 1+a=5-5a\ \Longrightarrow\ \boxed{a=\frac{2}{3}=0{,}666667}
+\]
+(e confere: $\tau_{tot}(0)=5+5=10{,}0000000000$).
+
+(b) Em $\omega=\pi/2$: $\tau_c(\pi/2)=-0{,}281517$ e
+$\tau_{ap}(\pi/2)=\dfrac{1-a^{2}}{1+a^{2}}\le1$ (máximo quando $a\to0$).
+Portanto o maior atraso total possível é
+\[
+  -0{,}281517+1=0{,}718483<3{,}5 ,
+\]
+ou seja, \textbf{impossível} com um passa-tudo de 1ª ordem.
+
+\resp{(a) $a=2/3$. (b) \textbf{Não}: o atraso máximo alcançável em $\pi/2$ é
+$0{,}7185$ amostras; seria necessário um equalizador de ordem maior.}
+
+% ---------------------------------------------------------------- 12.3
+\exer{\textbf{(Desafio 03)} Um sistema tem zeros em $z=2$ e $z=-0{,}3$ e polos
+em $z=0{,}7$ e $z=-0{,}6$, com ganho unitário no numerador.
+Obtenha $H(z)=H_{\min}(z)H_{ap}(z)$, compare $h[0..3]$ com $h_{\min}[0..3]$ e
+a energia acumulada.}
+
+\textbf{Solução.} Zeros: $2$ (fora) e $-0{,}3$ (dentro); polos: $0{,}7$ e
+$-0{,}6$ (dentro). O zero $z_0=2$ é refletido para $1/2=0{,}5$, e
+\[
+  H_{ap}(z)=\frac{0{,}5-z^{-1}}{1-0{,}5z^{-1}}\quad(\text{polo }0{,}5,
+  \text{zero }2),\qquad
+  H_{\min}(z)=\frac{2\,(1-0{,}5z^{-1})(1+0{,}3z^{-1})}
+  {(1-0{,}7z^{-1})(1+0{,}6z^{-1})}.
+\]
+O fator $2=|z_0|$ aparece porque $|1-2z^{-1}|=2|1-0{,}5z^{-1}|$ sobre o
+círculo unitário. Verificação numérica: $\operatorname{conv}(h_{\min},
+h_{ap})$ reproduz $h$ com erro máximo $2{,}2\times10^{-16}$; $|H_{ap}|=1$ em
+todas as frequências testadas. Respostas ao impulso:
+\[
+  h[0..3]=\{\,1{,}0,\ -1{,}6,\ -0{,}34,\ -0{,}706\,\},\qquad
+  h_{\min}[0..3]=\{\,2{,}0,\ -0{,}2,\ 0{,}52,\ -0{,}032\,\}.
+\]
+Energia nos três primeiros instantes:
+\[
+  E_3=\sum_{n=0}^{2}|h[n]|^{2}=3{,}6756,\qquad
+  E_{3,\min}=\sum_{n=0}^{2}|h_{\min}[n]|^{2}=4{,}3104 ,
+\]
+com \emph{energias totais iguais} (mesmo $|H|$) — prova prática de que a fase
+mínima \textbf{antecipa} a energia.
+
+\resp{$H_{\min}$ com zeros $0{,}5$ e $-0{,}3$ (fator $2$) e
+$H_{ap}(z)=(0{,}5-z^{-1})/(1-0{,}5z^{-1})$; $E_3=3{,}6756$ contra
+$E_{3,\min}=4{,}3104$ com energia total idêntica.}

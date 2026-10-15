@@ -1,0 +1,173 @@
+% =============================================================================
+\section{Discretização por invariância ao impulso}\label{sec:invimp}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\paragraph{Definição.} Dado um protótipo analógico $H_a(s)$ com resposta ao
+impulso $h_a(t)$, o filtro digital é definido por
+\[
+  \boxed{\ h[n]=T_s\,h_a(nT_s)\ }
+\]
+(a multiplicação por $T_s$ é o que faz $|H(e^{j\omega})|\approx|H_a(j\Omega)|$
+na banda-base). No plano $z$, cada polo $p_k$ do protótipo vira
+\[
+  z_k=e^{p_kT_s}\qquad\text{e}\qquad
+  H(z)=\sum_k\frac{T_sA_k}{1-e^{p_kT_s}z^{-1}},
+  \qquad A_k=\text{resíduo de }H_a \text{ em }p_k .
+\]
+
+\paragraph{Caso de polos complexos (o do Desafio 08).} Para
+\[
+  H_a(s)=\frac{s}{s^2+2\zeta\omega_ns+\omega_n^2},\qquad
+  \sigma=\zeta\omega_n,\ \omega_d=\omega_n\sqrt{1-\zeta^2},
+\]
+\[
+  h_a(t)=e^{-\sigma t}\Bigl[\cos\omega_dt-\frac{\sigma}{\omega_d}
+  \operatorname{sen}\omega_dt\Bigr]u(t),
+\]
+e, escrevendo $r=e^{-\sigma T_s}$ e $\theta=\omega_dT_s$,
+\[
+  \boxed{\ H(z)=\frac{T_s\left[1-r\left(\cos\theta+
+  \frac{\sigma}{\omega_d}\operatorname{sen}\theta\right)z^{-1}\right]}
+  {1-2r\cos\theta\,z^{-1}+r^{2}z^{-2}}\ }
+\]
+de modo que
+\[
+  b_0=T_s,\quad
+  b_1=-T_sr\Bigl(\cos\theta+\frac{\sigma}{\omega_d}\operatorname{sen}\theta\Bigr),
+  \quad a_1=-2r\cos\theta,\quad a_2=r^{2}.
+\]
+
+\paragraph{O que o método preserva e o que ele destrói.}
+\begin{itemize}
+  \item \textbf{Preserva:} a resposta ao impulso amostrada (por construção) e
+        as posições dos \textbf{polos} ($z=e^{pT_s}$), logo
+        estabilidade e frequência de ressonância.
+  \item \textbf{Destrói/Inventa:} os \textbf{zeros}. Zeros \emph{não} são
+        mapeados por $z=e^{sT_s}$: o numerador de $H(z)$ é apenas combinado
+        pelos resíduos. Um zero em $s=0$ (passa-altas) simplesmente
+        desaparece.
+  \item \textbf{Aliasing:} a resposta em frequência é a soma de réplicas
+        (Capítulo~\ref{sec:amostragem}):
+        \[
+          H(e^{j\omega})=\sum_kH_a\!\left(j\frac{\omega-2\pi k}{T_s}\right)
+          +\frac{T_sh_a(0^+)}{2}.
+        \]
+  \item \textbf{Conclusão prática:} o método é adequado para filtros
+        \emph{limitados em banda} (passa-baixas e passa-faixa com
+        $|H_a(j\Omega)|\to0$ em alta frequência). Ele \textbf{falha} para
+        passa-altas e rejeita-faixa, onde $|H_a(j\Omega)|\to\text{const}\neq0$.
+\end{itemize}
+
+\ideia{Teste rápido de validade: se $|H_a(j\Omega)|$ não tende a zero quando
+$\Omega\to\infty$, o somatório de réplicas diverge e o filtro digital obtido
+não terá nada a ver com o protótipo. Nesse caso usa-se a transformação
+bilinear (Capítulo~\ref{sec:bilinear}).}
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 15.1
+\exer{Discretize $h_a(t)=e^{-1000t}u(t)$ com $T_s=0{,}1$ ms. Dê $H(z)$, o
+ganho em DC e compare com o analógico $H_a(0)=1/1000$.}
+
+\textbf{Solução.} Polos: $p=-1000$ (real) $\Rightarrow z_0=e^{-1000\cdot10^{-4}}
+=e^{-0{,}1}=0{,}9048374180$, e o resíduo é 1, logo
+\[
+  H(z)=\frac{T_s}{1-e^{-1000T_s}z^{-1}}
+      =\frac{10^{-4}}{1-0{,}9048374180\,z^{-1}} .
+\]
+Ganho em DC:
+\[
+  H(1)=\frac{10^{-4}}{1-0{,}9048374180}=1{,}0508332\times10^{-3}
+  \quad\text{contra}\quad H_a(0)=\frac{1}{1000}=1{,}000\times10^{-3}.
+\]
+Erro de $+5{,}08\%$ — resíduo da aproximação ``soma de Riemann'' da
+integração usada no mapeamento (o erro cresce com $aT_s$; aqui
+$aT_s=0{,}1$).
+
+\resp{$H(z)=\dfrac{10^{-4}}{1-0{,}9048374180z^{-1}}$;
+$H(1)=1{,}0508332\times10^{-3}$ ($+5{,}08\%$ em relação a $1/a$).}
+
+% ---------------------------------------------------------------- 15.2
+\exer{\textbf{(Item 2 do Desafio 08)} Aplique o método ao protótipo
+$H_a(s)=\dfrac{s}{s^2+200\pi s+(12000\pi)^2}$ com $T_s=25\ \mu$s e escreva os
+coeficientes de $H(z)$.}
+
+\textbf{Solução.} Do Capítulo~\ref{sec:laplace}: $\sigma=100\pi$,
+$\omega_d=100\pi\sqrt{14399}$. Então
+\[
+  r=e^{-\sigma T_s}=e^{-100\pi\cdot25\times10^{-6}}
+   =0{,}992176780293,
+\]
+\[
+  \theta=\omega_dT_s=100\pi\sqrt{14399}\cdot25\times10^{-6}
+   =0{,}942445070585\ \text{rad}=0{,}2999895832\pi\ \text{rad/amostra}.
+\]
+Com $T_s=2{,}5\times10^{-5}$:
+\[
+  \begin{array}{rcl}
+    b_0&=&T_s=2{,}500000000000\times10^{-5},\\[1mm]
+    b_1&=&-T_sr\left(\cos\theta+\frac{\sigma}{\omega_d}\operatorname{sen}\theta\right)
+        =-1{,}474755715063\times10^{-5},\\[1mm]
+    a_1&=&-2r\cos\theta=-1{,}166426294332,\\[1mm]
+    a_2&=&r^{2}=0{,}984414763352 .
+  \end{array}
+\]
+Polos: $z=0{,}992176780e^{\pm j0{,}29999\pi}$ ($|z|<1$: estável). Note que
+$\theta\approx0{,}3\pi$, que é justamente o $\omega_0$ do Item 3.
+
+\resp{$b_0=T_s$, $b_1=-1{,}4747557\times10^{-5}$, $a_1=-1{,}1664263$,
+$a_2=0{,}9844148$; polos em $0{,}992177e^{\pm j0{,}3\pi}$.}
+
+% ---------------------------------------------------------------- 15.3
+\exer{\textbf{(desafio de reflexão)} Mostre que o método degenera para o
+passa-altas $H_a(s)=\dfrac{s}{s+2000\pi}$ com $T_s=25\ \mu$s, calculando
+$|H(1)|$ e $|H(-1)|$ e explicando a causa.}
+
+\textbf{Solução.} Anti-transformando:
+\[
+  h_a(t)=\delta(t)-2000\pi e^{-2000\pi t}u(t),
+\]
+que tem o termo impulsivo $\delta(t)$ — a marca registrada dos passa-altas.
+Amostrando,
+\[
+  h[n]=T_s\delta[n]-T_s\,2000\pi\,\alpha^{n}u[n],\qquad
+  \alpha=e^{-2000\pi T_s}=0{,}8546359992,
+\]
+\[
+  H(z)=T_s-\frac{T_s\cdot2000\pi}{1-\alpha z^{-1}}
+      =\frac{(T_s-T_s\,2000\pi)-T_s\alpha z^{-1}}{1-\alpha z^{-1}} .
+\]
+Ganhos nos extremos da banda digital:
+\[
+  |H(1)|=\left|\frac{T_s-T_s\cdot2000\pi-T_s\alpha}{1-\alpha}\right|
+  =1{,}080570 \quad(+0{,}6731\ \text{dB}),
+\]
+\[
+  |H(-1)|=\left|\frac{(T_s-T_s\cdot2000\pi)+T_s\alpha}{1+\alpha}\right|
+  =0{,}084671 \quad(-21{,}4453\ \text{dB}) .
+\]
+O ganho \emph{cai} de $1{,}08$ em DC para $0{,}085$ em Nyquist: o
+``passa-altas'' virou \textbf{passa-baixas}. Causas (três argumentos
+independentes):
+\begin{enumerate}
+  \item $|H_a(j\Omega)|=\frac{\Omega}{\sqrt{\Omega^2+(2000\pi)^2}}\to1$
+        quando $\Omega\to\infty$: cada réplica da identidade de Poisson tem
+        ganho $\approx1$ e o somatório \textbf{não converge} — nenhum $F_s$
+        conserta isso.
+  \item O zero em $s=0$, que definia o passa-altas, \textbf{não é mapeado}
+        para $z=1$: o zero do filtro digital ficou em
+        $z=-\hat{b}_1/\hat{b}_0\approx-1{,}36\times10^{-4}$ (praticamente na
+        origem).
+  \item Algebricamente, $H(z)$ é a soma de um termo constante
+        ($T_s\delta[n]$) com um \textbf{passa-baixas de 1ª ordem} (o polo em
+        $\alpha$); a diferença de uma constante com um passa-baixas é uma
+        função \emph{decrescente} da frequência.
+\end{enumerate}
+Solução correta para passa-altas: \textbf{transformação bilinear com
+pré-deformação} (Capítulo~\ref{sec:bilinear}).
+
+\resp{$|H(1)|=1{,}080570$ e $|H(-1)|=0{,}084694$: filtro passa-baixas;
+falha porque $|H_a|\not\to0$ em HF (réplicas não decaem) e porque zeros não
+mapeiam ($s=0\nrightarrow z=1$).}

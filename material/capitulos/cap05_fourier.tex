@@ -1,0 +1,100 @@
+% =============================================================================
+\section{Transformada de Fourier: espectro, banda e modulação}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\[
+  X(j\Omega)=\int_{-\infty}^{\infty}x(t)e^{-j\Omega t}dt,\qquad
+  x(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}X(j\Omega)e^{j\Omega t}d\Omega .
+\]
+A TFT é a transformada de Laplace avaliada em $s=j\Omega$ (quando o eixo
+$j\Omega$ está na ROC). Propriedades que você mais vai usar:
+\[
+  x(t-t_0)\leftrightarrow e^{-j\Omega t_0}X(j\Omega),\qquad
+  x(t)e^{j\Omega_0 t}\leftrightarrow X\bigl(j(\Omega-\Omega_0)\bigr),
+\]
+\[
+  x(t)\cos(\Omega_0 t)\leftrightarrow
+  \tfrac{1}{2}\bigl[X(j(\Omega-\Omega_0))+X(j(\Omega+\Omega_0))\bigr],
+  \qquad
+  x_1*x_2\leftrightarrow X_1X_2,
+\]
+\[
+  \text{Parseval:}\quad E=\int|x(t)|^2dt=\frac{1}{2\pi}\int|X(j\Omega)|^2d\Omega .
+\]
+
+\paragraph{Pulso retangular e a primeira noção de ``banda''.} Para
+$x(t)=\operatorname{rect}(t/T)$ (largura $T$):
+\[
+  X(j\Omega)=\int_{-T/2}^{T/2}e^{-j\Omega t}dt
+            =\frac{2\operatorname{sen}(\Omega T/2)}{\Omega}
+            =T\,\operatorname{sinc}\!\Bigl(\frac{\Omega T}{2\pi}\Bigr),
+\]
+que é o \textbf{sinc} com primeiros nulos em
+$\Omega=\pm2\pi/T\ \Leftrightarrow\ f=\pm1/T$: \emph{quanto mais estreito no
+tempo, mais largo no espectro} (princípio da incerteza tempo--frequência).
+
+\paragraph{Banda e taxa de amostragem.} Se $X(j\Omega)=0$ para
+$|\Omega|>2\pi B$, o sinal é \textbf{limitado em banda a $B$ Hz}. Esse $B$ é o
+número que entra no critério de Nyquist do Capítulo~\ref{sec:amostragem}
+($F_s>2B$).
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 5.1
+\exer{$x(t)=\operatorname{rect}(t/T)$ com $T=1$ ms. Esboce a densidade
+espectral, indique os primeiros nulos e calcule $X(j0)$.}
+
+\textbf{Solução.} Da fórmula geral,
+\[
+  X(j\Omega)=T\,\operatorname{sinc}\!\Bigl(\frac{\Omega T}{2\pi}\Bigr)
+  =\frac{\operatorname{sen}(\Omega T/2)}{\Omega/2},
+  \qquad T=10^{-3}\ \text{s}.
+\]
+Primeiros nulos: $f=\pm1/T=\pm1000$ Hz; $X(j0)=T=10^{-3}$.
+Em $f=500$ Hz: $\operatorname{sinc}(0{,}5)=2/\pi=0{,}6366$, logo
+$|X|=0{,}6366\,T=6{,}366\times10^{-4}$.
+
+\resp{$X(j\Omega)=T\operatorname{sinc}(\Omega T/2\pi)$, nulos em $\pm1$ kHz,
+$X(j0)=T=1$ ms.}
+
+% ---------------------------------------------------------------- 5.2
+\exer{Um sinal de áudio limitado a $B=4$ kHz é transmitido por uma portadora
+de $f_c=100$ kHz. Qual a banda ocupada e qual a taxa de amostragem mínima
+para o sinal modulado?}
+
+\textbf{Solução.} A modulação desloca o espectro para $\pm f_c$:
+\[
+  x(t)\cos(2\pi f_ct)\ \longleftrightarrow\
+  \tfrac12 X\bigl(f-f_c\bigr)+\tfrac12 X\bigl(f+f_c\bigr),
+\]
+isto é, duas faixas de $4$ kHz centradas em $\pm100$ kHz. Banda total ocupada:
+\[
+  [f_c-B,\ f_c+B]=[96,\ 104]\ \text{kHz}\ \Rightarrow\ \text{largura}=2B=8\ \text{kHz}
+\]
+(frequências positivas). Para amostrar o \emph{sinal modulado} sem aliasing é
+preciso $F_s>2(104\ \text{kHz})=208$ kHz (amostragem em banda-base). Usando
+\emph{band-pass sampling} a taxa mínima cai para $2\cdot8=16$ kHz, desde que a
+banda seja posicionada corretamente.
+
+\resp{Banda $=8$ kHz (de 96 a 104 kHz); $F_s>208$ kHz em banda-base
+($>16$ kHz com amostragem de banda).}
+
+% ---------------------------------------------------------------- 5.3
+\exer{Calcule a energia de $x(t)=e^{-t}u(t)$ por Parseval e confirme o valor
+obtido no domínio do tempo.}
+
+\textbf{Solução.} Domínio do tempo: $E=\int_0^\infty e^{-2t}dt=\frac12$.
+Domínio da frequência: $X(j\Omega)=\frac{1}{1+j\Omega}$,
+$|X|^2=\frac{1}{1+\Omega^2}$, então
+\[
+  E=\frac{1}{2\pi}\int_{-\infty}^{\infty}\frac{d\Omega}{1+\Omega^2}
+   =\frac{1}{2\pi}\bigl[\arctan\Omega\bigr]_{-\infty}^{\infty}
+   =\frac{1}{2\pi}\cdot\pi=\frac12 .
+\]
+Os dois caminhos coincidem — e é essa igualdade que permite ``medir'' energia
+no domínio digital, onde a energia de $h[n]$ é
+$\sum_n|h[n]|^2=\frac{1}{2\pi}\int_{-\pi}^{\pi}|H(e^{j\omega})|^2d\omega$.
+
+\resp{$E=1/2$ nos dois domínios (Parseval).}

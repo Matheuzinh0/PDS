@@ -1,0 +1,110 @@
+% =============================================================================
+\section{Reconstrução, retentor de ordem zero e a identidade de Poisson}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\paragraph{Reconstrução ideal.} O filtro de reconstrução é um passa-baixas
+ideal de ganho $T_s$ e corte $F_s/2$, cuja resposta ao impulso é um sinc:
+\[
+  h_r(t)=\operatorname{sinc}\!\Bigl(\frac{t}{T_s}\Bigr),\qquad
+  x(t)=\sum_n x[n]\,\operatorname{sinc}\!\Bigl(\frac{t-nT_s}{T_s}\Bigr).
+\]
+
+\paragraph{Retentor de ordem zero (ZOH).} Na prática usa-se
+$h_{zoh}(t)=1$ para $0\le t<T_s$:
+\[
+  H_{zoh}(j\Omega)=T_s\,e^{-j\Omega T_s/2}\,
+  \operatorname{sinc}\!\Bigl(\frac{f}{F_s}\Bigr),
+\]
+com duas consequências: (i) um \textbf{atraso} de $T_s/2$; (ii) uma
+\textbf{atenuação} que chega a $-3{,}92$ dB em $f=F_s/2$ (queda de sinc).
+
+\paragraph{A identidade de Poisson — e o termo que quase todo mundo esquece.}
+Tomando $h[n]=T_s\,h_a(nT_s)$ (a definição da invariância ao impulso do
+Capítulo~\ref{sec:invimp}), vale a soma periódica
+\[
+  H(e^{j\omega})=\sum_{k=-\infty}^{\infty}
+  H_a\!\left(j\frac{\omega-2\pi k}{T_s}\right)
+  \;+\;\underbrace{\frac{T_s\,h_a(0^+)}{2}}_{\text{meia-descontinuidade}}
+\]
+O último termo é necessário sempre que $h_a(t)$ tem \textbf{salto em
+$t=0$} (em particular quando $h_a(0^+)\neq0$ e $h_a(0^-)=0$, o caso de
+\emph{todos} os filtros causais analógicos). Sem ele a soma de réplicas fica
+exatamente $T_s h_a(0^+)/2$ abaixo do valor verdadeiro.
+
+\ideia{Duas leituras práticas: (1) a resposta do filtro digital é a soma de
+``cópias'' do protótipo analógico deslocadas de $kF_s$ — logo, baixando $F_s$,
+as cópias invadem a banda-base; (2) o termo de meia-descontinuidade explica
+por que o ganho em DC do filtro do desafio não é zero, mas $\approx T_s/2$.}
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 7.1
+\exer{Um ZOH reconstrói um sinal amostrado a $F_s$. Calcule a atenuação do
+filtro de retenção em $f=F_s/2$ e em $f=0{,}4F_s$, e o atraso introduzido.}
+
+\textbf{Solução.} $|H_{zoh}|=T_s|\operatorname{sinc}(f/F_s)|$:
+\[
+  f=\frac{F_s}{2}:\quad |\operatorname{sinc}(0{,}5)|=\frac{\operatorname{sen}(\pi/2)}{\pi/2}
+  =\frac{2}{\pi}=0{,}636620\ \Rightarrow\
+  -3{,}9224\ \text{dB};
+\]
+\[
+  f=0{,}4F_s:\quad |\operatorname{sinc}(0{,}4)|=0{,}756827\ \Rightarrow\
+  -2{,}4201\ \text{dB}.
+\]
+O atraso de fase é $\phi=-\Omega T_s/2\Rightarrow$ atraso de $T_s/2$ (meia
+amostra) em \emph{todas} as frequências.
+
+\resp{$-3{,}9224$ dB em $F_s/2$; $-2{,}4201$ dB em $0{,}4F_s$; atraso de
+$T_s/2$. É por isso que conversores D/A práticos usam ``compensação de
+$\operatorname{sinc}$''.}
+
+% ---------------------------------------------------------------- 7.2
+\exer{Verifique numericamente a identidade de Poisson (com e sem a correção de
+meia-descontinuidade) para $h_a(t)=e^{-1000t}u(t)$ com $T_s=0{,}1$ ms, na
+frequência $\omega=0$.}
+
+\textbf{Solução.} O valor exato vem da transformada $Z$ da sequência amostrada
+(polos reais):
+\[
+  H(z)=\frac{T_s}{1-e^{-aT_s}z^{-1}},\qquad
+  H(e^{j0})=\frac{T_s}{1-e^{-aT_s}}
+  =\frac{10^{-4}}{1-0{,}9048374180}=1{,}05083319\times10^{-3}.
+\]
+Somando as réplicas $\sum_k\frac{1}{a+j(\omega-2\pi k)/T_s}$ obtém-se, sem
+correção, $1{,}00083307\times10^{-3}$; com o termo
+$T_sh_a(0^+)/2=T_s/2=5\times10^{-5}$ obtém-se
+$1{,}05083307\times10^{-3}$ — que é o valor exato até a 7ª casa.
+Na varredura de frequência, o desvio médio das réplicas ``puras'' em relação
+ao exato é $-5{,}00001266\times10^{-5}\approx-T_s/2$.
+
+\resp{Sem a correção falta exatamente $T_s h_a(0^+)/2=5\times10^{-5}$; com ela
+o erro relativo cai para $\sim10^{-7}$.}
+
+% ---------------------------------------------------------------- 7.3
+\exer{\textbf{(o filtro do Desafio 08)} Explique e comprove numericamente por
+que $\sum_n h[n]\approx T_s/2$ e não zero, apesar de $H_a(j0)=0$.}
+
+\textbf{Solução.} Para o filtro do desafio, $H_a(s)=s/(s^2+200\pi s+\cdots)$
+tem $H_a(j0)=0$; portanto, em princípio, a soma dos $h[n]$ deveria ser nula
+(do mesmo modo que $\int h_a(t)dt=H_a(0)=0$). Duas razões impedem o zero
+exato:
+\begin{enumerate}
+  \item $\sum_n h[n]=T_s\sum_n h_a(nT_s)$ é uma \emph{soma de Riemann} de
+        $\int h_a=0$ — aproximação, não igualdade;
+  \item a identidade de Poisson exige o termo
+        $T_sh_a(0^+)/2=T_s/2$, pois $h_a(0^+)=1$ (salto em $t=0$).
+\end{enumerate}
+O valor medido é
+\[
+  \left|H(e^{j0})\right|=1{,}2533725398\times10^{-5}
+  \quad\text{contra}\quad \frac{T_s}{2}=1{,}25\times10^{-5},
+\]
+isto é, $+0{,}27\%$ — praticamente \textbf{metade da primeira amostra}
+($h[0]=T_s=2{,}5\times10^{-5}$).
+
+\resp{$\sum_n h[n]=|H(e^{j0})|=1{,}25337\times10^{-5}\approx T_s/2$: o resíduo
+não é erro numérico, é o termo de meia-descontinuidade (o filtro é
+\emph{causal}, logo tem salto em $t=0$).}

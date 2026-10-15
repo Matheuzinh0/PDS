@@ -1,0 +1,111 @@
+% =============================================================================
+\section{Sequências e sistemas discretos: LTI, convolução e BIBO}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\paragraph{Sequências de referência.}
+\[
+  \delta[n]=
+  \begin{cases}1,&n=0\\0,&n\neq0\end{cases},\qquad
+  u[n]=
+  \begin{cases}1,&n\ge0\\0,&n<0\end{cases},\qquad
+  x[n]=A\alpha^n u[n]\ \text{(geométrica)}.
+\]
+
+\paragraph{Convolução discreta.} Para um sistema LTI discreto com resposta ao
+impulso $h[n]$:
+\[
+  y[n]=x[n]*h[n]=\sum_{k=-\infty}^{\infty}x[k]\,h[n-k]
+      =\sum_{k=-\infty}^{\infty}h[k]\,x[n-k].
+\]
+Propriedades: comutativa, associativa, distributiva (idênticas ao caso
+contínuo — toda a intuição do Capítulo~\ref{sec:slit} vale aqui trocando
+$\int$ por $\sum$).
+
+\paragraph{Equações de diferenças.} Sistemas implementáveis satisfazem
+\[
+  \sum_{k=0}^{N}a_ky[n-k]=\sum_{m=0}^{M}b_mx[n-m],
+  \qquad H(z)=\frac{\sum_m b_mz^{-m}}{\sum_k a_kz^{-k}} .
+\]
+\begin{itemize}
+  \item $a_k=0$ para $k\ge1$ (só numerador): \textbf{FIR} --- resposta ao
+        impulso de duração finita, \emph{sempre} estável.
+  \item Se há $a_k\neq0$: \textbf{IIR} --- realimentação, requer cuidado com
+        estabilidade (Capítulo~\ref{sec:ftdig}).
+\end{itemize}
+
+\paragraph{Causalidade e estabilidade BIBO.}
+\[
+  \text{causal}\iff h[n]=0,\ n<0;\qquad
+  \text{BIBO estável}\iff \sum_{n=-\infty}^{\infty}|h[n]|<\infty .
+\]
+Para uma geométrica causal $h[n]=\alpha^nu[n]$:
+$\sum|h[n]|=\sum|\alpha|^n$ converge $\iff|\alpha|<1$ — o mesmo critério que
+aparecerá como ``polos dentro do círculo unitário''.
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 8.1
+\exer{\textbf{(canal do Desafio 04)} $y[n]=x[n]-2x[n-1]$. Obtenha $h[n]$,
+classifique (FIR/IIR, causal, estável) e calcule a resposta ao degrau $u[n]$.}
+
+\textbf{Solução.} A resposta ao impulso é a saída para $x[n]=\delta[n]$:
+\[
+  h[n]=\delta[n]-2\delta[n-1]=[1,\,-2]\ \text{para }n=0,1 .
+\]
+É \textbf{FIR} (duração 2), \textbf{causal} e \textbf{estável}
+($\sum|h|=1+2=3<\infty$). Para a entrada $u[n]$:
+\[
+  y[n]=u[n]-2u[n-1]=
+  \begin{cases}1,&n=0\\ -1,&n\ge1\end{cases}
+\]
+isto é, $y[n]=\delta[n]-u[n-1]$: a saída ``salta'' e depois estabiliza em
+$-1=H(1)=1-2\cdot1$. Ganho em DC: $H(z)=1-2z^{-1}\Rightarrow H(1)=-1$.
+
+\resp{$h[n]=\{1,-2\}$, FIR causal estável; degrau $\to
+y[0]=1$ e $y[n]=-1$ para $n\ge1$ (ganho DC $=-1$). Note que este canal tem um
+\textbf{zero} em $z=2$, fora do círculo unitário — a raiz da dificuldade de
+equalização do Desafio 04.}
+
+% ---------------------------------------------------------------- 8.2
+\exer{$h[n]=\left(\tfrac12\right)^nu[n]$. Calcule a resposta ao degrau e
+verifique os 6 primeiros valores.}
+
+\textbf{Solução.} Para $n\ge0$,
+\[
+  y[n]=\sum_{k=0}^{n}\left(\tfrac12\right)^k
+      =\frac{1-(1/2)^{n+1}}{1-1/2}
+      =2-\left(\tfrac12\right)^{n},
+\]
+e $y[n]=0$ para $n<0$. Valores (calculados numericamente):
+\[
+  y[0..7]=\{1,\ 1{,}5,\ 1{,}75,\ 1{,}875,\ 1{,}9375,\ 1{,}96875,\
+  1{,}984375,\ 1{,}992188\}
+\]
+tendendo a $y(\infty)=\frac{1}{1-1/2}=2=H(1)$, o ganho em DC — coerente com o
+teorema do valor final para sequências.
+
+\resp{$y[n]=\left[2-(1/2)^n\right]u[n]$, convergindo para $2$ (ganho DC).}
+
+% ---------------------------------------------------------------- 8.3
+\exer{Classifique quanto à estabilidade BIBO: (a) $h_1[n]=2^nu[n]$,
+(b) $h_2[n]=(1/2)^{|n|}$, (c) $h_3[n]=\frac{1}{n+1}u[n]$.}
+
+\textbf{Solução.}
+\[
+  \text{(a)}\ \sum_{n\ge0}2^n\to\infty\ \Rightarrow\ \textbf{instável};
+\]
+\[
+  \text{(b)}\ \sum_{n=-\infty}^{\infty}\left(\tfrac12\right)^{|n|}
+  =1+2\sum_{n\ge1}2^{-n}=1+2=3<\infty\ \Rightarrow\ \textbf{estável}
+  \ (\text{mas não causal});
+\]
+\[
+  \text{(c)}\ \sum_{n\ge0}\frac{1}{n+1}=\infty\ (\text{série harmônica})
+  \ \Rightarrow\ \textbf{instável}, \text{ embora } h_3[n]\to0 .
+\]
+O item (c) é o contraexemplo clássico: \emph{decaimento não garante
+estabilidade} — o que importa é a \textbf{somatibilidade absoluta}.
+
+\resp{(a) instável; (b) estável (não-causal); (c) instável (harmônica).}

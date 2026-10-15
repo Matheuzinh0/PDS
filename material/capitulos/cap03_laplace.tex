@@ -1,0 +1,123 @@
+% =============================================================================
+\section{Transformada de Laplace e função de transferência}\label{sec:laplace}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\[
+  X(s)=\int_{-\infty}^{\infty}x(t)e^{-st}\,dt,\qquad s=\sigma+j\Omega ,
+  \qquad x(t)=\frac{1}{2\pi j}\int_{\sigma-j\infty}^{\sigma+j\infty}X(s)e^{st}ds .
+\]
+A transformada existe apenas dentro da \textbf{região de convergência (ROC)},
+determinada pelos polos de $X(s)$. Propriedades essenciais:
+\[
+  \mathcal{L}\{x(t-t_0)\}=e^{-st_0}X(s),\qquad
+  \mathcal{L}\{e^{s_0t}x(t)\}=X(s-s_0),
+\]
+\[
+  \mathcal{L}\Bigl\{\frac{dx}{dt}\Bigr\}=sX(s),\qquad
+  x_1(t)*x_2(t)\ \longleftrightarrow\ X_1(s)X_2(s).
+\]
+Pares que valem a pena memorizar:
+\[
+  e^{-at}u(t)\leftrightarrow\frac{1}{s+a},\qquad
+  t\,e^{-at}u(t)\leftrightarrow\frac{1}{(s+a)^2},
+\]
+\[
+  e^{-at}\cos(\omega_0 t)u(t)\leftrightarrow\frac{s+a}{(s+a)^2+\omega_0^2},
+  \qquad
+  e^{-at}\operatorname{sen}(\omega_0 t)u(t)\leftrightarrow\frac{\omega_0}{(s+a)^2+\omega_0^2}.
+\]
+
+\paragraph{SLIT e função de transferência.} Para $h(t)$ causal, $H(s)$ é
+racional,
+\[
+  H(s)=\frac{N(s)}{D(s)}=K\frac{(s-z_1)(s-z_2)\cdots}{(s-p_1)(s-p_2)\cdots},
+\]
+com \textbf{zeros} $z_i$ e \textbf{polos} $p_i$.
+
+\begin{teo}[causalidade e estabilidade no plano $s$]
+Um SLIT é \textbf{causal} $\iff$ a ROC é um semiplano à direita do polo mais
+à direita (``$\operatorname{Re}\{s\}>\sigma_{\max}$''); é \textbf{BIBO
+estável} $\iff$ a ROC contém o eixo $j\Omega$. Consequentemente, um sistema
+causal e estável tem \emph{todos} os polos no semiplano esquerdo aberto
+($\operatorname{Re}\{p_i\}<0$).
+\end{teo}
+
+\paragraph{Frações parciais.} Para $H(s)=N(s)/D(s)$ com polos simples:
+\[
+  H(s)=\sum_i\frac{A_i}{s-p_i},\qquad A_i=(s-p_i)H(s)\big|_{s=p_i},
+\]
+e cada termo volta como $A_ie^{p_it}u(t)$ (se causal). Para polos complexos
+conjugados, agrupe o par e escreva na forma
+$\frac{(s+\sigma)}{(s+\sigma)^2+\omega_d^2}$ e
+$\frac{\omega_d}{(s+\sigma)^2+\omega_d^2}$, que invertem direto para
+$e^{-\sigma t}\cos(\omega_d t)$ e $e^{-\sigma t}\operatorname{sen}(\omega_d t)$.
+
+\paragraph{Par seno/cosseno é o coração do Desafio 08.} Se
+$H(s)=\frac{s}{s^2+2\zeta\omega_n s+\omega_n^2}$, escrevendo $\sigma=\zeta\omega_n$
+e $\omega_d=\omega_n\sqrt{1-\zeta^2}$:
+\[
+  H(s)=\frac{s}{(s+\sigma)^2+\omega_d^2}
+       =\underbrace{\frac{s+\sigma}{(s+\sigma)^2+\omega_d^2}}_{\text{cosseno}}
+       -\underbrace{\frac{\sigma}{(s+\sigma)^2+\omega_d^2}}_{\frac{\sigma}{\omega_d}\cdot\text{seno}},
+\]
+\[
+  \boxed{\ h(t)=e^{-\sigma t}\left[\cos(\omega_d t)-\frac{\sigma}{\omega_d}
+  \operatorname{sen}(\omega_d t)\right]u(t)\ }
+\]
+que é \emph{exatamente} o Item~1 do Desafio 08.
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 3.1
+\exer{Calcule $\mathcal{L}\{e^{-2t}\cos(3t)u(t)\}$ e confirme o resultado
+numericamente em $s=j$.}
+
+\textbf{Solução.} Pelo par do cosseno com $a=2$ e $\omega_0=3$:
+\[
+  X(s)=\frac{s+2}{(s+2)^2+9}=\frac{s+2}{s^2+4s+13},\qquad \operatorname{Re}\{s\}>-2 .
+\]
+Conferência em $s=j$: $X(j)=\frac{2+j}{(2+j)^2+9}=0{,}175+0{,}025j$
+(valor obtido numericamente no gabarito).
+
+\resp{$X(s)=\frac{s+2}{s^2+4s+13}$, ROC $\operatorname{Re}\{s\}>-2$; o
+deslocamento $\sigma=2$ desloca a ROC e as partes real/imaginária dos polos.}
+
+% ---------------------------------------------------------------- 3.2
+\exer{Obtenha $x(t)$ (causal) para $X(s)=\dfrac{s+4}{(s+1)(s+3)}$.}
+
+\textbf{Solução.} Polos simples em $s=-1$ e $s=-3$; resíduos:
+\[
+  A=(s+1)X(s)\Big|_{s=-1}=\frac{-1+4}{-1+3}=\frac{3}{2}=1{,}5,
+  \qquad
+  B=(s+3)X(s)\Big|_{s=-3}=\frac{-3+4}{-3+1}=-\frac{1}{2}=-0{,}5 .
+\]
+Logo
+\[
+  x(t)=\left(1{,}5\,e^{-t}-0{,}5\,e^{-3t}\right)u(t).
+\]
+Checagem: $x(0^+)=1{,}5-0{,}5=1$ e
+$\lim_{s\to\infty}sX(s)=1$ (teorema do valor inicial) — consistente.
+
+\resp{$x(t)=(1{,}5e^{-t}-0{,}5e^{-3t})u(t)$.}
+
+% ---------------------------------------------------------------- 3.3
+\exer{$H(s)=\dfrac{1}{(s+1)(s+2)}$. Obtenha $h(t)$, verifique estabilidade
+BIBO e calcule a resposta ao degrau em regime permanente.}
+
+\textbf{Solução.} Frações parciais:
+\[
+  H(s)=\frac{1}{s+1}-\frac{1}{s+2}
+  \ \Longrightarrow\
+  h(t)=\left(e^{-t}-e^{-2t}\right)u(t).
+\]
+Polos em $s=-1$ e $s=-2$: ambos com parte real negativa e ROC
+$\operatorname{Re}\{s\}>-1$ contendo o eixo $j\Omega$ $\Rightarrow$
+\textbf{causal e estável}. O ganho DC vem de $H(0)=1/2$, então um degrau
+unitário leva a saída a
+\[
+  y(\infty)=H(0)\cdot 1=\tfrac{1}{2}\ \text{(teorema do valor final)}.
+\]
+
+\resp{$h(t)=(e^{-t}-e^{-2t})u(t)$; estável e causal; $y(\infty)=0{,}5$.}

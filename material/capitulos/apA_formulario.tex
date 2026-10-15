@@ -1,0 +1,68 @@
+% =============================================================================
+\section{Formulário de bolso}\label{ap:form}
+% =============================================================================
+
+\subsection*{A.1 Pares e propriedades --- Laplace}
+
+\begin{center}
+\begin{tabular}{ll@{\qquad}ll}
+\toprule
+$x(t)$ & $X(s)$ & Propriedade & Regra\\
+\midrule
+$\delta(t)$ & $1$ & linearidade & $ax_1+bx_2\leftrightarrow aX_1+bX_2$\\
+$u(t)$ & $1/s$ & atraso & $x(t-t_0)\leftrightarrow e^{-st_0}X(s)$\\
+$e^{-at}u(t)$ & $\dfrac{1}{s+a}$ & modulação & $e^{-at}x(t)\leftrightarrow X(s+a)$\\
+$te^{-at}u(t)$ & $\dfrac{1}{(s+a)^2}$ & derivada & $\dot x\leftrightarrow sX(s)-x(0^-)$\\
+$\cos(\omega_0t)u(t)$ & $\dfrac{s}{s^2+\omega_0^2}$ & convolução & $x_1*x_2\leftrightarrow X_1X_2$\\
+$\operatorname{sen}(\omega_0t)u(t)$ & $\dfrac{\omega_0}{s^2+\omega_0^2}$ & valor inicial & $x(0^+)=\lim_{s\to\infty}sX(s)$\\
+$e^{-at}\cos(\omega_0t)u(t)$ & $\dfrac{s+a}{(s+a)^2+\omega_0^2}$ & valor final & $x(\infty)=\lim_{s\to0}sX(s)$\\
+$e^{-at}\operatorname{sen}(\omega_0t)u(t)$ & $\dfrac{\omega_0}{(s+a)^2+\omega_0^2}$ & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{A.2 Pares e propriedades --- $Z$}
+
+\begin{center}
+\begin{tabular}{ll@{\qquad}ll}
+\toprule
+$x[n]$ & $X(z)$ & ROC & Propriedade\\
+\midrule
+$\delta[n]$ & $1$ & todo $z$ & linearidade\\
+$u[n]$ & $\dfrac{1}{1-z^{-1}}$ & $|z|>1$ & atraso: $z^{-n_0}X(z)$\\
+$\alpha^{n}u[n]$ & $\dfrac{1}{1-\alpha z^{-1}}$ & $|z|>|\alpha|$ & convolução: $X_1X_2$\\
+$n\alpha^{n}u[n]$ & $\dfrac{\alpha z^{-1}}{(1-\alpha z^{-1})^2}$ & $|z|>|\alpha|$ & acumulação: $\frac{X(z)}{1-z^{-1}}$\\
+$\cos(\omega_0n)u[n]$ & $\dfrac{1-\cos\omega_0z^{-1}}{1-2\cos\omega_0z^{-1}+z^{-2}}$ & $|z|>1$ & derivada: $z\frac{dX}{dz}\leftrightarrow -nx[n]$\\
+$\operatorname{sen}(\omega_0n)u[n]$ & $\dfrac{\operatorname{sen}\omega_0z^{-1}}{1-2\cos\omega_0z^{-1}+z^{-2}}$ & $|z|>1$ & valor inicial: $x[0]=\lim_{z\to\infty}X(z)$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{A.3 Fórmulas de projeto e diagnose}
+
+\begin{center}
+\begin{tabular}{p{6.0cm}p{9.0cm}}
+\toprule
+Grandeza & Fórmula\\
+\midrule
+Frequência digital & $\omega=2\pi f/F_s$ (rad/amostra); $f=\frac{\omega}{2\pi}F_s$\\
+Aliasing & $f_{\text{ap}}=f\bmod F_s$, e $f_{\text{ap}}\to F_s-f_{\text{ap}}$ se $f_{\text{ap}}>F_s/2$\\
+2ª ordem analógica & $\sigma=\zeta\omega_n$, $\omega_d=\omega_n\sqrt{1-\zeta^2}$, $Q=\frac{1}{2\zeta}$\\
+Pico (passa-baixas 2ª ordem) & $\Omega_r=\omega_n\sqrt{1-2\zeta^2}$, $|H|_{\max}=\frac{1}{2\zeta\sqrt{1-\zeta^2}}$\\
+Pico (passa-faixa, num. $s$) & $|H(j\omega_n)|=\frac{1}{2\zeta\omega_n}$\\
+Banda de $-3$ dB (2ª ordem) & $\Delta\Omega\approx2\zeta\omega_n=\omega_n/Q$\\
+Banda de $-3$ dB (digital) & $\Delta\omega\approx2(1-r)$ para polo $re^{j\theta}$\\
+Atraso de grupo, 1ª ordem & $\tau(\omega)=\frac{1-a\cos\omega}{1-2a\cos\omega+a^2}-\frac{1-b\cos\omega}{1-2b\cos\omega+b^2}$\\
+Passa-tudo, 1ª ordem & $\tau_{ap}(\omega)=\frac{1-a^2}{1-2a\cos\omega+a^2}$ (máx. $\frac{1+a}{1-a}$ em $\omega=0$)\\
+Invariância ao impulso & $h[n]=T_sh_a(nT_s)$; $r=e^{-\sigma T_s}$, $\theta=\omega_dT_s$\\
+Coerência de Poisson & $H(e^{j\omega})=\sum_kH_a\!\left(j\frac{\omega-2\pi k}{T_s}\right)+\frac{T_sh_a(0^+)}{2}$\\
+Pré-deformação & $\Omega=2F_s\tan(\pi f/F_s)$\\
+Bilinear & $s=\frac{2}{T_s}\frac{1-z^{-1}}{1+z^{-1}}$\\
+Ordem Butterworth & $N\ge\frac{\log_{10}(\varepsilon_s/\varepsilon_p)}{\log_{10}(\Omega_s/\Omega_p)}$, $\varepsilon=\sqrt{10^{0{,}1A}-1}$\\
+Janela de Kaiser & $\beta=0{,}1102(A-8{,}7)$ ($A>50$); $M\approx\frac{A-8}{2{,}285\Delta\omega}$; atraso $M/2$\\
+FIR fase linear & $h[n]=h[M-n]$ ou $-h[M-n]$; tipos I--IV pelas restrições em $0$ e $\pi$\\
+Quantização & $q=2L/2^{b}$; quantize \emph{cada seção SOS} separadamente\\
+Estabilidade digital & todos os polos com $|p_i|<1$; equivalentemente ROC contém $|z|=1$\\
+\bottomrule
+\end{tabular}
+\end{center}

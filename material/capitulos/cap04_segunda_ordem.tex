@@ -1,0 +1,129 @@
+% =============================================================================
+\section{Filtros analógicos de 2ª ordem: o protótipo do Desafio 08}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+A forma canônica passa-faixa/passa-baixas de 2ª ordem com polos complexos é
+\[
+  H_a(s)=\frac{N(s)}{s^2+2\zeta\omega_n s+\omega_n^2},
+\]
+com $\omega_n$ (frequência natural, rad/s), $\zeta$ (fator de amortecimento) e
+$Q=\dfrac{1}{2\zeta}$ (fator de qualidade). Os polos são
+\[
+  p_{1,2}=-\zeta\omega_n\pm j\omega_n\sqrt{1-\zeta^2}
+         =-\sigma\pm j\omega_d,\qquad
+  \sigma=\zeta\omega_n,\quad \omega_d=\omega_n\sqrt{1-\zeta^2}.
+\]
+
+\paragraph{Quanto menor $\zeta$, mais seletivo (e mais lento).}
+\begin{itemize}
+  \item Banda de $-3$ dB (para $\zeta\ll 1$): $\ \Delta\Omega\approx2\zeta\omega_n=\omega_n/Q$.
+  \item Constante de decaimento no tempo: $\tau=1/\sigma=1/(\zeta\omega_n)=2Q/\omega_n$.
+  \item Pico de ressonância para $N(s)=\omega_n^2$ (passa-baixas):
+        $\Omega_r=\omega_n\sqrt{1-2\zeta^2}$ e
+        $|H|_{\max}=\frac{1}{2\zeta\sqrt{1-\zeta^2}}\approx Q$.
+\end{itemize}
+
+\paragraph{O numerador $s$ (passa-faixa) é o do Desafio 08.} Para
+\[
+  H_a(s)=\frac{s}{s^2+2\zeta\omega_n s+\omega_n^2}
+  \qquad\Longrightarrow\qquad
+  |H_a(j\Omega)|=\frac{\Omega}{\sqrt{(\omega_n^2-\Omega^2)^2+(2\zeta\omega_n\Omega)^2}}.
+\]
+Em $\Omega=\omega_n$ o primeiro termo do denominador se anula e sobra
+\[
+  \boxed{\ |H_a(j\omega_n)|=\frac{1}{2\zeta\omega_n}=\frac{Q}{\omega_n}\ }
+\]
+— note a \textbf{unidade} $1/(\text{rad/s})$: o ganho absoluto do protótipo é
+pequeno, e é isso que o método da invariância ao impulso vai reproduzir no
+domínio digital (Capítulo~\ref{sec:invimp}).
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 4.1
+\exer{Em $H_a(s)=\dfrac{1000^2}{s^2+2\zeta\cdot1000\,s+1000^2}$ com
+$\zeta=0{,}1$, determine os polos, o pico de ressonância e a banda de
+$-3$ dB.}
+
+\textbf{Solução.}
+\[
+  \sigma=\zeta\omega_n=100,\qquad
+  \omega_d=\omega_n\sqrt{1-\zeta^2}=1000\sqrt{0{,}99}=994{,}9874\ \text{rad/s},
+\]
+\[
+  p_{1,2}=-100\pm j994{,}9874\ \text{rad/s}.
+\]
+Pico (fórmula do passa-baixas de 2ª ordem):
+\[
+  \Omega_r=\omega_n\sqrt{1-2\zeta^2}=1000\sqrt{0{,}98}=989{,}9495\ \text{rad/s}
+  \ \bigl(=157{,}5554\ \text{Hz}\bigr),
+\]
+\[
+  |H|_{\max}=\frac{1}{2\zeta\sqrt{1-\zeta^2}}
+  =\frac{1}{0{,}2\cdot0{,}994\,99}=5{,}025189
+  \ \bigl(=14{,}0230\ \text{dB}\bigr)\ \approx\ Q=5 .
+\]
+Banda de $-3$ dB: $\Delta\Omega=2\zeta\omega_n=200$ rad/s
+$=31{,}8310$ Hz.
+
+\resp{Polos $-100\pm j994{,}9874$; pico em $989{,}9495$ rad/s com
+$|H|_{\max}=5{,}0252$ ($14{,}02$ dB $\approx Q$); banda $=200$ rad/s
+($31{,}83$ Hz).}
+
+% ---------------------------------------------------------------- 4.2
+\exer{\textbf{(o protótipo do desafio)} $H_a(s)=\dfrac{s}{s^2+200\pi s+(12000\pi)^2}$.
+Determine $\omega_n,\zeta,Q,\sigma,\omega_d,f_n,f_d$ e compare
+$|H_a(j\omega_n)|$ com o pico exato.}
+
+\textbf{Solução.} Comparando termo a termo:
+\[
+  \omega_n^2=(12000\pi)^2\Rightarrow\omega_n=12000\pi=37\,699{,}1118\ \text{rad/s},
+  \qquad f_n=\frac{\omega_n}{2\pi}=6000\ \text{Hz},
+\]
+\[
+  2\zeta\omega_n=200\pi\Rightarrow \zeta=\frac{200\pi}{2\cdot12000\pi}
+  =\frac{1}{120}=8{,}3333\times10^{-3},\qquad Q=\frac{1}{2\zeta}=60 .
+\]
+\[
+  \sigma=\zeta\omega_n=100\pi=314{,}1593\ \text{rad/s},\qquad
+  \omega_d=\omega_n\sqrt{1-\zeta^2}=100\pi\sqrt{14399}=37\,697{,}8028\ \text{rad/s},
+\]
+\[
+  f_d=\frac{\omega_d}{2\pi}=5999{,}79\ \text{Hz}
+  \ \ (\text{note: }f_d\neq f_n,\text{ embora muito próximo}).
+\]
+No pico:
+\[
+  |H_a(j\omega_n)|=\frac{1}{2\zeta\omega_n}=\frac{1}{200\pi}
+  =1{,}5915494309\times10^{-3},
+\]
+enquanto o máximo \emph{exato} (em $\Omega_r=\omega_n\sqrt{1-2\zeta^2}
+=37\,696{,}4938$ rad/s) vale $1{,}5916046959\times10^{-3}$: diferença de
+$3\times10^{-5}$ dB — ou seja, pode-se usar $1/(200\pi)$ sem medo.
+
+\resp{$\omega_n=37\,699{,}1118$ rad/s ($6000$ Hz), $\zeta=1/120$, $Q=60$,
+$\sigma=100\pi$, $\omega_d=100\pi\sqrt{14399}=37\,697{,}8028$ rad/s;
+$|H_a(j\omega_n)|=1/(200\pi)=1{,}59155\times10^{-3}$ ($-55{,}9636$ dB).}
+
+% ---------------------------------------------------------------- 4.3
+\exer{Um passa-faixa de 2ª ordem tem $f_0=6$ kHz e $Q=60$. Estime a banda de
+$-3$ dB em Hz e o tempo de acomodação da resposta ao impulso (a $1\%$).}
+
+\textbf{Solução.} Com $\omega_n=2\pi f_0=37\,699{,}1118$ rad/s:
+\[
+  \Delta f=\frac{f_0}{Q}=\frac{6000}{60}=100\ \text{Hz}
+  \qquad(\Delta\Omega=2\pi\cdot100=628{,}32\ \text{rad/s}).
+\]
+Constante de decaimento:
+\[
+  \tau=\frac{1}{\sigma}=\frac{2Q}{\omega_n}=\frac{120}{37\,699{,}1118}
+  =3{,}1831\ \text{ms}.
+\]
+Para $e^{-t/\tau}=0{,}01$ (1\%): $t=4{,}605\,\tau=14{,}66$ ms — é uma
+\emph{memória longa}, motivo pelo qual o filtro digital obtido no Capítulo~15
+tem resposta ao impulso que decai lentamente (polos a $0{,}9922$ do círculo
+unitário).
+
+\resp{$\Delta f=100$ Hz ($\Delta\Omega=628{,}32$ rad/s); $\tau=3{,}1831$ ms e
+$t_{1\%}\approx14{,}7$ ms.}

@@ -1,0 +1,110 @@
+% =============================================================================
+\section{Sinais e sistemas contínuos: vocabulário e grandezas}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+Um \textbf{sinal} é uma função do tempo; no domínio contínuo escrevemos $x(t)$,
+$t\in\mathbb{R}$. Três famílias resolvem praticamente todos os problemas de PDS:
+
+\begin{itemize}
+  \item \textbf{Exponencial complexa:} $x(t)=e^{st}$, $s=\sigma+j\Omega$. Se
+        $\sigma=0$ temos a senoide $e^{j\Omega t}=\cos\Omega t+j\operatorname{sen}\Omega t$.
+  \item \textbf{Degrau:} $u(t)=1$ para $t\ge 0$ e $0$ para $t<0$; o ``liga/desliga''
+        que torna os sinais causais.
+  \item \textbf{Impulso:} $\delta(t)$, definido por $\int x(t)\delta(t-t_0)\,dt=x(t_0)$.
+\end{itemize}
+
+\paragraph{Energia e potência média.}
+\[
+  E=\int_{-\infty}^{\infty}|x(t)|^2\,dt, \qquad
+  P=\lim_{T\to\infty}\frac{1}{T}\int_{-T/2}^{T/2}|x(t)|^2\,dt .
+\]
+Sinal de energia: $0<E<\infty$ e $P=0$. Sinal de potência: $0<P<\infty$ e
+$E=\infty$. Para a senoide real $x(t)=A\cos(\Omega_0 t+\phi)$ vale sempre
+$P=A^2/2$, \emph{independentemente} de $\Omega_0$ e $\phi$.
+
+\paragraph{Periodicidade.} $x(t)$ é periódico se existe $T>0$ com
+$x(t+T)=x(t)$. Para uma soma $x(t)=\sum_i A_i\cos(\Omega_i t+\phi_i)$, a
+periodicidade ocorre se e somente se todas as razões $\Omega_i/\Omega_j$ são
+\emph{racionais}; o período fundamental é $T_0=1/f_0$, com $f_0=\mathrm{mdc}$
+das frequências em Hz.
+
+\paragraph{Classificação de sistemas.} Um sistema $y=\mathcal{T}\{x\}$ é
+\begin{itemize}
+  \item \textbf{sem memória} se $y(t)$ depende só de $x(t)$;
+  \item \textbf{causal} se $y(t)$ depende apenas de $x(\tau)$, $\tau\le t$;
+  \item \textbf{invariante no tempo (TI)} se deslocar a entrada desloca a saída;
+  \item \textbf{linear} se $\mathcal{T}\{a x_1+b x_2\}=a\,\mathcal{T}\{x_1\}+b\,\mathcal{T}\{x_2\}$;
+  \item \textbf{estável (BIBO)} se entrada limitada $\Rightarrow$ saída limitada.
+\end{itemize}
+Linear $+$ invariante no tempo $=$ \textbf{SLIT}, a classe que domina a
+disciplina e cuja análise se resume à convolução (Capítulo~\ref{sec:slit}).
+
+\paragraph{Formas de onda de referência.}
+\[
+  \operatorname{rect}(t)=
+  \begin{cases}1,&|t|<1/2\\0,&|t|>1/2\end{cases},
+  \qquad
+  \operatorname{tri}(t)=
+  \begin{cases}1-|t|,&|t|<1\\0,&|t|>1\end{cases},
+  \qquad
+  \operatorname{sinc}(t)=\frac{\operatorname{sen}(\pi t)}{\pi t}.
+\]
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 1.1
+\exer{$x(t)=3\cos(200\pi t+\pi/4)$. Determine amplitude, frequência
+(rad/s e Hz), período, valor de pico e potência média.}
+
+\textbf{Solução.} Comparando com $A\cos(\Omega_0 t+\phi)$:
+\[
+  A=3,\qquad \Omega_0=200\pi\ \text{rad/s},\qquad
+  f_0=\frac{\Omega_0}{2\pi}=100\ \text{Hz},\qquad
+  T_0=\frac{1}{f_0}=0{,}01\ \text{s}=10\ \text{ms}.
+\]
+Valor de pico $=A=3$ (unidade do sinal). Potência média:
+\[
+  P=\frac{A^2}{2}=\frac{9}{2}=4{,}5\ \text{W}.
+\]
+
+\resp{$A=3$, $\Omega_0=200\pi$ rad/s, $f_0=100$ Hz, $T_0=10$ ms, $P=4{,}5$ W.}
+
+% ---------------------------------------------------------------- 1.2
+\exer{Calcule a energia de $x(t)=e^{-2t}u(t)$ e classifique o sinal.}
+
+\textbf{Solução.} Aplicando a definição e integrando:
+\[
+  E=\int_0^{\infty}e^{-4t}\,dt
+   =\left[-\frac{e^{-4t}}{4}\right]_{0}^{\infty}
+   =\frac{1}{4}=0{,}25\ \text{J}.
+\]
+Como $0<E<\infty$, o sinal é de \textbf{energia} (logo $P=0$). Generalizando,
+$x(t)=e^{-at}u(t)$ tem $E=1/(2a)$ para $a>0$ — resultado usado várias vezes
+adiante.
+
+\resp{$E=1/(2a)=0{,}25$ J; sinal de energia.}
+
+% ---------------------------------------------------------------- 1.3
+\exer{$x(t)=2\cos(4\pi t)+3\operatorname{sen}(6\pi t)$ é periódico? Em caso
+afirmativo, determine o período fundamental e a potência média.}
+
+\textbf{Solução.} As frequências são $f_1=2$ Hz e $f_2=3$ Hz; a razão
+$f_1/f_2=2/3$ é \textbf{racional}, portanto a soma é periódica. O período
+fundamental é o menor $T$ com $2T\in\mathbb{Z}$ \emph{e} $3T\in\mathbb{Z}$:
+\[
+  f_0=\mathrm{mdc}(2,3)=1\ \text{Hz}\ \Rightarrow\ T_0=\frac{1}{f_0}=1\ \text{s}.
+\]
+Potência: como $\cos$ e $\operatorname{sen}$ de frequências distintas são
+ortogonais em um período, as potências somam:
+\[
+  P=\frac{2^2}{2}+\frac{3^2}{2}=2+4{,}5=6{,}5\ \text{W}.
+\]
+
+\resp{$T_0=1$ s, $P=6{,}5$ W.}
+
+\begin{obs}
+Se a razão das frequências fosse irracional (por exemplo $f_2=1/(2\pi)$ Hz),
+a soma \emph{não} seria periódica, mesmo sendo limitada.
+\end{obs}

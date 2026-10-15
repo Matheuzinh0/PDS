@@ -1,0 +1,167 @@
+% =============================================================================
+\section{Transformação bilinear e pré-deformação}\label{sec:bilinear}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+A transformação bilinear mapeia o semiplano esquerdo $s$ no \emph{interior} do
+círculo unitário:
+\[
+  \boxed{\ s=\frac{2}{T_s}\frac{1-z^{-1}}{1+z^{-1}}\ }
+  \qquad\Longleftrightarrow\qquad
+  z=\frac{1+\frac{T_s}{2}s}{1-\frac{T_s}{2}s}.
+\]
+Consequências:
+\begin{itemize}
+  \item \textbf{Não há aliasing}: todo o eixo $j\Omega$ é mapeado
+        \emph{uma única vez} no círculo unitário.
+  \item \textbf{Há distorção (warping)} no eixo de frequência:
+        \[
+          \Omega=\frac{2}{T_s}\tan\!\Bigl(\frac{\omega}{2}\Bigr)
+          \ \Longleftrightarrow\
+          \omega=2\arctan\!\Bigl(\frac{\Omega T_s}{2}\Bigr),
+        \]
+        que comprime frequências altas ($\Omega\to\infty\Rightarrow\omega\to\pi$).
+  \item \textbf{Pré-deformação (pre-warping)} para manter as frequências
+        críticas exatas:
+        \[
+          \boxed{\ \Omega_p=\frac{2}{T_s}\tan\!\Bigl(\frac{\omega_p}{2}\Bigr)
+          =2F_s\tan\!\Bigl(\pi\frac{f_p}{F_s}\Bigr)\ }
+        \]
+\end{itemize}
+
+\paragraph{Roteiro de projeto (passa-baixas/passa-faixa/altas/notch).}
+\begin{enumerate}
+  \item Converta as especificações digitais ($\omega_p,\omega_s$, dB) em
+        frequências analógicas \emph{pré-deformadas} com a fórmula acima.
+  \item Projete o protótipo analógico (Butterworth, Chebyshev, elíptico) com
+        $\Omega_p,\Omega_s$. Para Butterworth de ordem $N$,
+        \[
+          N\ \ge\
+          \frac{\log_{10}\!\left(\dfrac{\varepsilon_s}{\varepsilon_p}\right)}
+               {\log_{10}\!\left(\dfrac{\Omega_s}{\Omega_p}\right)},
+          \qquad
+          \varepsilon=\sqrt{10^{0{,}1A}-1},\ A\ \text{em dB}.
+        \]
+  \item Aplique a bilinear ($s=\frac{2}{T_s}\frac{1-z^{-1}}{1+z^{-1}}$) e
+        normalize $a_0=1$.
+  \item Implemente em cascata de seções de 2ª ordem (Capítulo~\ref{sec:estr}).
+\end{enumerate}
+
+\paragraph{Passa-faixa.} O protótipo passa-baixas equivalente usa a
+transformação $\Omega\to\frac{\Omega^2-\Omega_0^2}{B\Omega}$, com
+$\Omega_0=\sqrt{\Omega_{p1}\Omega_{p2}}$ (centro geométrico) e
+$B=\Omega_{p2}-\Omega_{p1}$ (largura). A ordem final do filtro passa-faixa é
+$2N$ (cada polo do protótipo gera um par conjugado).
+
+\paragraph{Comparação direta com a invariância ao impulso.}
+\begin{center}
+\begin{tabular}{p{4.1cm}p{4.6cm}p{4.6cm}}
+\toprule
+ & Invariância ao impulso & Bilinear\\
+\midrule
+Regra & $h[n]=T_sh_a(nT_s)$ & $s=\frac{2}{T_s}\frac{1-z^{-1}}{1+z^{-1}}$\\
+Polos & $z=e^{pT_s}$ (exato) & $z=\frac{1+pT_s/2}{1-pT_s/2}$\\
+Zeros & não mapeiam & mapeiam (mesma regra)\\
+Aliasing & \textbf{sim} (réplicas) & \textbf{não}\\
+Eixo de $\omega$ & linear & distorcido (exige pre-warping)\\
+Passa-altas & \textbf{falha} & funciona\\
+Nulos de $H$ & preservados em $\omega$ & preservados em $\Omega$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 16.1
+\exer{\textbf{(Desafio 09)} Com $F_s=1000$ Hz, calcule as frequências
+analógicas pré-deformadas de $5$, $20$, $100$, $150$ e $300$ Hz e compare com
+os valores sem pré-deformação.}
+
+\textbf{Solução.} Aplicando $\Omega=2F_s\tan(\pi f/F_s)$:
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$f$ [Hz] & $\omega=2\pi f/F_s$ & $\Omega$ com pre-warp [rad/s] & $2\pi f$ (sem warp)\\
+\midrule
+$5$   & $0{,}01\pi$ & $31{,}418511$  & $31{,}415927$\\
+$20$  & $0{,}04\pi$ & $125{,}829335$ & $125{,}663706$\\
+$100$ & $0{,}20\pi$ & $649{,}839392$ & $628{,}318531$\\
+$150$ & $0{,}30\pi$ & $1019{,}050899$& $942{,}477796$\\
+$300$ & $0{,}60\pi$ & $2752{,}763841$& $1884{,}955592$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Observe como o erro relativo cresce com a frequência: $0{,}008\%$ em
+$5$ Hz, $3{,}4\%$ em $100$ Hz e $46\%$ em $300$ Hz. Fazer pré-deformação só é
+``opcional'' quando todas as frequências críticas são muito menores que
+$F_s$.
+
+\resp{$\Omega_{p1}=125{,}8293$, $\Omega_{p2}=1019{,}0509$,
+$\Omega_{s1}=31{,}4185$, $\Omega_{s2}=2752{,}7638$ rad/s (os valores de
+$5$ e $300$ Hz são os da banda de rejeição).}
+
+% ---------------------------------------------------------------- 16.2
+\exer{Projete por bilinear um passa-baixas de 1ª ordem com $f_c=100$ Hz e
+$F_s=1000$ Hz. Verifique $|H|$ em DC, em $100$ Hz e em Nyquist.}
+
+\textbf{Solução.} Pré-deformação: $\Omega_p=2\cdot1000\tan(0{,}1\pi)
+=649{,}839392$ rad/s, e o protótipo é $H_a(s)=\frac{\Omega_p}{s+\Omega_p}$.
+Substituindo $s=2000\frac{1-z^{-1}}{1+z^{-1}}$:
+\[
+  H(z)=\frac{\Omega_p(1+z^{-1})}{(2000+\Omega_p)+(\Omega_p-2000)z^{-1}}
+      =\frac{0{,}2452372753\left(1+z^{-1}\right)}{1-0{,}5095254495\,z^{-1}} .
+\]
+Verificações:
+\[
+  |H(e^{j0})|=1 \quad(0\ \text{dB}),\qquad
+  |H|_{\,f=100\,\text{Hz}}=\frac{1}{\sqrt2}=0{,}7071067812\
+  (-3{,}0103\ \text{dB}),
+\]
+\[
+  |H|_{\,f=F_s/2}=0 \quad(\text{zero em }z=-1),
+\]
+ou seja, a frequência de corte caiu \emph{exatamente} em $-3$ dB — o
+pré-warping fez seu trabalho.
+
+\resp{$b=\{0{,}2452372753;\ 0{,}2452372753\}$, $a=\{1;\ -0{,}5095254495\}$;
+$-3{,}0103$ dB em $100$ Hz e zero em Nyquist.}
+
+% ---------------------------------------------------------------- 16.3
+\exer{Determine a ordem do protótipo Butterworth para o passa-faixa do
+Desafio 09: banda passante de $20$ a $150$ Hz (ripple $1$ dB), rejeição em
+$f\le5$ e $f\ge300$ Hz com $\ge30$ dB, $F_s=1000$ Hz.}
+
+\textbf{Solução.} Usando os valores pré-deformados do Exercício 16.1:
+\[
+  B_p=\frac{\Omega_{p2}-\Omega_{p1}}{\Omega_{p1}\Omega_{p2}}
+      =\frac{1019{,}050899-125{,}829335}{125{,}829335\cdot1019{,}050899}
+      =0{,}0069659672,
+\]
+\[
+  B_s=\frac{\Omega_{s2}-\Omega_{s1}}{\Omega_{s1}\Omega_{s2}}
+      =\frac{2752{,}763841-31{,}418511}{31{,}418511\cdot2752{,}763841}
+      =0{,}0314650993 .
+\]
+Fatores de ondulação:
+\[
+  \varepsilon_p=\sqrt{10^{0{,}1\cdot1}-1}=0{,}508847,\qquad
+  \varepsilon_s=\sqrt{10^{0{,}1\cdot30}-1}=31{,}606961 .
+\]
+Ordem (protótipo passa-baixas equivalente):
+\[
+  N\ \ge\
+  \frac{\log_{10}(\varepsilon_s/\varepsilon_p)}
+       {\log_{10}(B_s/B_p)}
+  =\frac{\log_{10}(62{,}11)}{\log_{10}(4{,}516975)}
+  =\frac{1{,}7931}{0{,}6548}=2{,}738340
+  \ \Longrightarrow\ \boxed{N=3}.
+\]
+O filtro digital final tem ordem $\mathbf{2N=6}$ (três seções de 2ª ordem),
+com centro geométrico $\Omega_0=\sqrt{\Omega_{p1}\Omega_{p2}}
+=358{,}087275$ rad/s ($56{,}9914$ Hz) e largura $B=\Omega_{p2}-\Omega_{p1}
+=893{,}2216$ rad/s.
+
+\resp{$N=3$ para o protótipo passa-baixas $\Rightarrow$ filtro passa-faixa de
+ordem $6$ (3 seções SOS); $\varepsilon_p=0{,}5088$,
+$\varepsilon_s=31{,}60696$, $B_s/B_p=4{,}5170$.}

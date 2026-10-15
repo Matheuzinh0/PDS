@@ -1,0 +1,162 @@
+==============================================================================
+ PDS 2026.2 - DESAFIO 08
+ Discretizacao de Filtros IIR por Invariância ao Impulso
+ e Analise de Aliasing Espectral
+==============================================================================
+
+==============================================================================
+(1) ITEM 1 - Resposta ao impulso analógica ha(t) = L^-1{Ha(s)}
+==============================================================================
+  Ha(s) = s / [ s^2 + 200*pi*s + (12000*pi)^2 ]
+        = s / [ s^2 + 2*zeta*wn*s + wn^2 ]
+
+  wn     = 12000*pi        = 37699.111843 rad/s      (fn = 6000.0000 Hz)
+  2*zeta*wn = 200*pi       => zeta = 200/(2*12000) = 1/120 = 0.0083333333
+  Q = 1/(2*zeta)           = 60.000000
+  sigma  = zeta*wn = 100*pi = 314.159265 rad/s
+  wd = wn*sqrt(1-zeta^2)   = 100*pi*sqrt(14399) = 37697.802823 rad/s
+
+  Fracoes parciais:
+        s                (s+sigma)             sigma
+  ---------------  =  ----------------  -  ----------------
+  (s+sigma)^2+wd^2   (s+sigma)^2+wd^2     (s+sigma)^2+wd^2
+
+  Logo:
+    ha(t) = e^(-100*pi*t) * [ cos(wd*t) - (100/11999.583)*sen(wd*t) ], t >= 0
+    ha(t) = e^(-100*pi*t) * [ cos(wd*t) - (1/sqrt(14399))*sen(wd*t) ]
+
+  com wd = 100*pi*sqrt(14399) = 37697.802823 rad/s
+  Forma exata (SymPy): (-sqrt(119)*sen(1100*sqrt(119)*pi*t)/1309 + cos(1100*sqrt(119)*pi*t))*exp(-100*pi*t)
+
+  ha(0+) = 1.000000   (salto em t = 0 -> relevante para o item de aliasing)
+  |Ha(j*wn)| = 1/(2*zeta*wn) = 1/(200*pi) = 1.5915494309e-03
+
+==============================================================================
+(2) ITEM 2 - Discretizacao por invariância ao impulso: coeficientes de H(z)
+==============================================================================
+  Ts = 25 us  (Fs = 40 kHz)
+  h[n] = Ts*ha(n*Ts)
+
+  Deduzindo com  r = exp(-sigma*Ts)  e  theta = wd*Ts :
+
+         Ts*[ 1 - r*(cos(theta) + (sigma/wd)*sen(theta)) * z^-1 ]
+  H(z) = ---------------------------------------------------------
+                1 - 2*r*cos(theta)*z^-1 + r^2*z^-2
+
+  r     = exp(-100*pi*25e-6) = 0.992176780293
+  theta = wd*Ts              = 0.942445070585 rad = 0.299989583152*pi rad/amostra
+  cos(theta) = 0.587811727457   sen(theta) = 0.808997758380
+
+  COEFICIENTES NUMERICOS EXATOS:
+    b0 = Ts                 = 2.500000000000e-05
+    b1 = -Ts*r*(cos+ (sig/wd)sen) = -1.474755715063e-05
+    a1 = -2*r*cos(theta)    = -1.166426294332e+00
+    a2 = r^2                = 9.844147633517e-01
+
+  H(z) = (2.500000e-05 -1.474756e-05 z^-1) / (1 -1.166426e+00 z^-1 +9.844148e-01 z^-2)
+
+  Polos (complexos conjugados): z = 0.992176780 * exp(+/-j*0.942445071)  ->  |z| < 1  (ESTAVEL)
+     |z| = r = exp(-sigma*Ts) = 0.992176780  (|z| < 1 confirma estabilidade)
+     angulo = theta = 0.299989583*pi rad/amostra  -> f = 5999.791663 Hz
+  Zero: z = -b1/b0 = 0.589902286  (inventado pelo metodo; zeros NAO mapeiam por z = e^(s*Ts))
+
+  Ganho em DC: |H(e^j0)| = 1.253373e-05 (~ Ts/2 = 1.250000e-05, residuo do termo de meia-descontinuidade)
+  Frequência pedida: w0 = 2*pi*6000*Ts = 0.3000000000*pi = 0.3*pi rad/amostra (6000 Hz)
+
+==============================================================================
+(3) ITEM 3 - Ganho de pico em w0 = 0.3*pi e analise de aliasing
+==============================================================================
+  (a) Filtro ANALOGICO
+      pico |Ha| = 1.5914941640e-03  = -55.9639 dB
+      em Omega_r = wn*sqrt(1-2*zeta^2) = 37696.4938 rad/s = 5999.5833 Hz
+      em Omega = wn: |Ha(j*wn)| = 1.5915494309e-03 = 1/(2*zeta*wn) = 1/(200*pi)
+
+  (b) Filtro DIGITAL obtido por invariância ao impulso (Fs = 40 kHz)
+      |H(e^j*w0)| com w0 = 0.3*pi = 1.6040862640e-03 = -55.8954 dB
+      pico varrido  = 1.6040876049e-03 = -55.8954 dB em w = 0.29999675*pi  (f = 5999.9350 Hz)
+      banda de -3 dB: 100.0200 Hz  (w de 0.297504*pi a 0.302505*pi)
+      ganho em DC   = 1.253373e-05 (~0, coerente com Ha(j0) = 0)
+
+  (c) Comparacao analógico x digital em 6000 Hz
+      analógico: 1.5915494309e-03 (-55.9636 dB)
+      digital  : 1.6040862640e-03 (-55.8954 dB)
+      diferença: +0.0685 dB  (+0.7877 %)
+
+  RESPOSTA: a diferença e de ~0,07 dB (0,8 %), ou seja, DESPREZIVEL.
+  Não ha alteracao significativa do pico: as réplicas do espectro caem em
+  34 kHz e 46 kHz (= Fs -/+ 6 kHz), onde |Ha| e cerca de 50 dB abaixo do
+  pico:
+      |Ha(j*2*pi*34kHz)| = 4.831e-06 = -106.3 dB absolutos (pico = -56.0 dB)
+      |Ha(j*2*pi*46kHz)| = 3.520e-06 = -109.1 dB absolutos
+  A condição de Nyquist e folgadamente satisfeita: Fs/2 = 20 kHz >> 6 kHz.
+
+  (d) Contraprova - reducao de Fs (aliasing frequêncial):
+      Fs =  20.0 kHz -> pico  -55.827 dB em  5999.65 Hz   ( 1.016x o pico analógico)
+      Fs =  15.0 kHz -> pico  -55.777 dB em  5999.10 Hz   ( 1.022x o pico analógico)
+      Fs =  12.0 kHz -> pico  -49.829 dB em  6000.00 Hz   ( 2.026x o pico analógico)
+      Fs =   8.0 kHz -> pico  -55.624 dB em  2000.20 Hz   ( 1.040x o pico analógico)
+
+  Com Fs = 15 kHz a imagem da componente de -6 kHz (em 9 kHz) dobra
+  exatamente sobre 6 kHz -> pico sobe de +0,19 dB. Com Fs = 12 kHz a
+  ressonância cai em Nyquist e a imagem se soma EM FASE: o pico dobra
+  (+6,1 dB). Abaixo de 12 kHz a própria ressonância e subamostrada.
+
+==============================================================================
+(4) DESAFIO DE REFLEXAO DA DUPLA - Falha no filtro PASSA-ALTAS
+==============================================================================
+  Ha_hp(s) = s/(s + 2000*pi)   ->  fc = 1 kHz, |Ha(j*0)| = 0 e
+  |Ha(j*Omega)| -> 1 quando Omega -> infinito (passa-altas ideal em HF).
+
+  ha_hp(t) = delta(t) - 2000*pi*e^(-2000*pi*t)*u(t)
+
+  Amostrando:  h[n] = Ts*delta[n] - Ts*2000*pi*alpha^n*u[n],
+               com alpha = exp(-2000*pi*Ts) = 0.854635999
+
+  H(z) = Ts - Ts*2000*pi/(1 - alpha*z^-1)
+       = [ (Ts - Ts*2000*pi) - Ts*alpha*z^-1 ] / (1 - alpha*z^-1)
+
+    b = [-1.5705463268e-01, -2.1365899979e-05]
+    a = [1, -8.5463599915e-01]
+    zero em z = -b1/b0 = -1.3604119544e-04  (praticamente z = 0)
+    polo em z = alpha   = 0.8546359992
+
+  |H(e^j0)|   = 1.080570  (+0.6731 dB)  <-- DC
+  |H(e^jpi)|  = 0.084671  (-21.4453 dB)  <-- Nyquist
+
+  CONCLUSAO: o ganho agora DECRESCE com a frequência (1,0806 -> 0,0847):
+  o 'passa-altas' virou um PASSA-BAIXAS degenerado, com ganho > 1 em DC.
+  O zero do eixo j*Omega em s = 0 (que definia o passa-altas) não tem
+  nenhum zero correspondente em z = 1: os zeros não são mapeados por
+  z = e^(s*Ts) pelo metodo da invariância ao impulso.
+
+  Causa de fundo: |Ha(j*Omega)| NAO tende a zero quando Omega -> oo.
+  A identidade de Poisson
+      H(e^jw) = sum_k Ha(j*(w-2*pi*k)/Ts) + Ts*ha(0+)/2
+  tem, para o passa-altas, réplica de amplitude ~1 em TODO k, ou seja, o
+  somatorio das réplicas NAO converge (energia de todo o eixo de frequência
+  e dobrada para dentro da banda digital). Nenhuma taxa de amostragem
+  corrige isso - o problema e do metodo, não de Fs.
+
+  RESSALVA PROVENIENTE DA MEDICAO NUMERICA (verificacao.py):
+    |Ha(j*34kHz)| = 1.000 -> a réplica em 34 kHz tem ganho praticamente 1.
+
+==============================================================================
+(5) PARTE COMPUTACIONAL - geracao das figuras
+==============================================================================
+    [figura] figuras/fig01_ha_t_e_amostras.png | figuras/fig01_ha_t_e_amostras.pdf
+    [figura] figuras/fig02_resposta_impulso_digital.png | figuras/fig02_resposta_impulso_digital.pdf
+    [figura] figuras/fig03_magnitude_analogico_vs_digital.png | figuras/fig03_magnitude_analogico_vs_digital.pdf
+    [figura] figuras/fig04_aliasing_replicas.png | figuras/fig04_aliasing_replicas.pdf
+    [figura] figuras/fig05_polos_zeros.png | figuras/fig05_polos_zeros.pdf
+    [figura] figuras/fig06_falha_passa_altas.png | figuras/fig06_falha_passa_altas.pdf
+    [figura] figuras/fig07_erro_aliasing_vs_Fs.png | figuras/fig07_erro_aliasing_vs_Fs.pdf
+
+==============================================================================
+(6) RELATORIO
+==============================================================================
+
+  [relatorio] resultados/relatorio_resultados.md
+
+==============================================================================
+ FIM - 7 figuras em figuras/ e relatorio em resultados/
+==============================================================================

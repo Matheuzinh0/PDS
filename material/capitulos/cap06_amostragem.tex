@@ -1,0 +1,109 @@
+% =============================================================================
+\section{Amostragem, teorema de Nyquist e aliasing}\label{sec:amostragem}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+Amostrar é multiplicar por um trem de impulsos
+$p(t)=\sum_n\delta(t-nT_s)$. No domínio da frequência isso \textbf{repete} o
+espectro a cada $F_s=1/T_s$:
+\[
+  x_s(t)=x(t)p(t)\ \longleftrightarrow\
+  X_s(j\Omega)=\frac{1}{T_s}\sum_{k=-\infty}^{\infty}
+  X\bigl(j(\Omega-k\Omega_s)\bigr),\qquad \Omega_s=\frac{2\pi}{T_s}=2\pi F_s .
+\]
+
+\begin{teo}[teorema da amostragem]
+Se $x(t)$ é limitado em banda a $B$ Hz ($X(j\Omega)=0$ para $|\Omega|>2\pi B$)
+e $F_s>2B$, as réplicas \textbf{não se sobrepõem} e $x(t)$ pode ser
+reconstruído exatamente por um filtro passa-baixas ideal de corte $F_s/2$. A
+frequência $F_N=F_s/2$ é a \textbf{frequência de Nyquist}.
+\end{teo}
+
+\paragraph{Aliasing (dobramento).} Se $F_s<2B$, as réplicas se sobrepõem: cada
+componente de frequência $f$ aparece na banda digital como
+\[
+  \boxed{\ f_{\text{aparente}}=\bigl|f-kF_s\bigr|,\quad
+  \text{escolhendo }k\text{ tal que }0\le f_{\text{aparente}}\le F_s/2\ }
+\]
+Mnemônico: \textbf{faixa de Nyquist} $[0,F_s/2]$ com ``espelhamento'' em
+múltiplos ímpares de $F_s/2$:
+\[
+  f_{\text{ap}}=f\ \bmod\ F_s,\qquad
+  f_{\text{ap}}\leftarrow F_s-f_{\text{ap}}\ \text{se }f_{\text{ap}}>F_s/2 .
+\]
+Notas importantes: (i) $f=0$ e $f=F_s$ são indistinguíveis; (ii) $f=F_s/2$
+``cai em cima'' da borda da banda; (iii) um tom exatamente em $kF_s$ vira
+CC (degenera em constante).
+
+\paragraph{Decimação.} Reduzir a taxa por $M$ (manter 1 de cada $M$ amostras)
+leva $F_s\to F_s/M$; para não criar aliasing \textbf{é obrigatório} um filtro
+passa-baixas digital (anti-aliasing) com corte $\omega_c=\pi/M$ \emph{antes} de
+descartar amostras.
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 6.1
+\exer{Um sinal contém as componentes $200$, $600$, $1300$, $2000$ e $3000$ Hz e
+é amostrado a $F_s=4000$ Hz. Qual a frequência aparente de cada componente?}
+
+\textbf{Solução.} $F_s/2=2000$ Hz. Aplicando
+$f_{\text{ap}}=|f-kF_s|$:
+\[
+  \begin{array}{c|c|c}
+    f\ \text{[Hz]} & k & f_{\text{ap}}\ \text{[Hz]}\\ \hline
+    200  & 0 & 200\\
+    600  & 0 & 600\\
+    1300 & 0 & 1300\\
+    2000 & - & 2000\ (\text{exatamente em Nyquist})\\
+    3000 & -1 & |3000-4000|=1000
+  \end{array}
+\]
+Ou seja: $3000$ Hz ``se disfarça'' de $1000$ Hz — é \emph{aliasing}.
+
+\resp{200, 600, 1300, 2000 (borda) e \textbf{1000} Hz (o tom de 3000 Hz
+dobrou).}
+
+% ---------------------------------------------------------------- 6.2
+\exer{\textbf{(Desafio 01)} O sinal acima é decimado por $M=4$ (nova
+$F_s'=1000$ Hz) \emph{sem} filtro anti-aliasing. Determine as frequências
+aparentes após a decimação.}
+
+\textbf{Solução.} Agora a banda-base digital é $[0,500]$ Hz:
+\[
+  200\ \text{Hz}\to200\ \text{Hz};\qquad
+  600\ \text{Hz}\to|600-1000|=400\ \text{Hz};\qquad
+  1300\ \text{Hz}\to|1300-1000|=300\ \text{Hz}.
+\]
+Conclusão: as componentes de $600$ e $1300$ Hz sofreram \textbf{aliasing} e
+caíram em $400$ e $300$ Hz. Com um FIR anti-aliasing de corte
+$\omega_c=\pi/M=\pi/4$ aplicado antes, ambas seriam atenuadas antes da
+decimação e o sinal decimado conteria essencialmente apenas a componente de
+$200$ Hz.
+
+\resp{$200\to200$, $600\to\textbf{400}$ e $1300\to\textbf{300}$ Hz
+(as duas últimas por aliasing).}
+
+% ---------------------------------------------------------------- 6.3
+\exer{\textbf{(desafio de reflexão)} Com $F_s=15$ kHz, mostre que um tom de
+$9$ kHz aparece em $6$ kHz. E se $F_s=12$ kHz, o que ocorre com o tom de
+$6$ kHz?}
+
+\textbf{Solução.} Para $F_s=15$ kHz, $F_s/2=7{,}5$ kHz. Como
+$9>7{,}5$, o tom dobra em relação a $F_s$:
+\[
+  f_{\text{ap}}=|9-15|=6\ \text{kHz}.
+\]
+Ou seja, um tom de $9$ kHz torna-se \emph{indistinguível} de um de $6$ kHz —
+por isso, no Desafio 08, a ``imagem'' da ressonância de $-6$ kHz (que após a
+amostragem cai em $+9$ kHz) volta para $6$ kHz e \textbf{soma-se em fase} com
+a componente original, inflando o pico do filtro digital.
+
+Para $F_s=12$ kHz: $F_s/2=6$ kHz, então o tom de $6$ kHz cai
+\textbf{exatamente em Nyquist} — não há dobramento, mas o tom fica na borda da
+banda (na prática: sensível a qualquer imperfeição de filtro e à fase). No
+Desafio 08 esse é o caso crítico em que o pico do filtro digital
+\emph{dobra} de amplitude.
+
+\resp{$9$ kHz $\to6$ kHz para $F_s=15$ kHz; para $F_s=12$ kHz o tom de $6$ kHz
+fica exatamente em $F_s/2$ (Nyquist) — fronteira em que o pico digital dobra.}

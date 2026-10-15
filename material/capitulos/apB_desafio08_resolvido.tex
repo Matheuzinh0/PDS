@@ -1,0 +1,104 @@
+% =============================================================================
+\section{Desafio 08 resolvido em uma página}\label{ap:desafio}
+% =============================================================================
+
+\subsection*{B.1 Enunciado}
+
+Protótipo analógico
+\[
+  H_a(s)=\frac{s}{s^2+200\pi s+(12000\pi)^2},
+  \qquad T_s=25\ \mu\text{s}\ (F_s=40\ \text{kHz}),
+\]
+método da \textbf{invariância ao impulso}. Pede-se: (1) $h_a(t)$; (2) $H(z)$ de
+2ª ordem com coeficientes exatos; (3) ganho de pico em
+$\omega_0=2\pi\cdot6000\cdot T_s$ e comparação com o analógico; mais o
+\emph{desafio de reflexão} sobre passa-altas.
+
+\subsection*{B.2 Passo a passo}
+
+\textbf{(1) Parâmetros.} $\omega_n=12000\pi=37\,699{,}1118$ rad/s,
+$\zeta=1/120$, $Q=60$, $\sigma=100\pi=314{,}1593$ rad/s,
+$\omega_d=100\pi\sqrt{14399}=37\,697{,}8028$ rad/s.
+
+\textbf{(2) $h_a(t)$.}
+\[
+  h_a(t)=e^{-100\pi t}\left[\cos(\omega_dt)-\frac{1}{\sqrt{14399}}
+  \operatorname{sen}(\omega_dt)\right]u(t),
+\]
+com $h_a(0^+)=1$ (salto em $t=0$).
+
+\textbf{(3) $H(z)$.} $r=e^{-\sigma T_s}=0{,}992176780293$,
+$\theta=\omega_dT_s=0{,}2999895832\pi$, e
+\[
+  b_0=2{,}5\times10^{-5},\quad b_1=-1{,}474755715063\times10^{-5},\quad
+  a_1=-1{,}166426294332,\quad a_2=0{,}984414763352 .
+\]
+\[
+  H(z)=\frac{2{,}5\times10^{-5}-1{,}474755715\times10^{-5}z^{-1}}
+  {1-1{,}166426294z^{-1}+0{,}984414763z^{-2}}
+\]
+Polos $0{,}992176780\,e^{\pm j0{,}29999\pi}$ (estável); zero
+$z=0{,}589902286$; ganho DC $=1{,}2533725398\times10^{-5}\approx T_s/2$.
+
+\textbf{(4) Item 3 --- ganho de pico em $\omega_0=0{,}3\pi$:}
+\[
+  \left|H(e^{j0{,}3\pi})\right|=1{,}6040862640\times10^{-3}
+  \ (-55{,}8954\ \text{dB})
+\]
+contra o analógico
+$|H_a(j\omega_n)|=\frac{1}{200\pi}=1{,}5915494309\times10^{-3}$
+($-55{,}9636$ dB): diferença de
+$\mathbf{+0{,}0685}$ \textbf{dB} — \textbf{não houve alteração
+significativa}, pois $F_s/2=20$ kHz está muito acima de $6$ kHz (as réplicas
+caem em $34$ e $46$ kHz, $\sim50$ dB abaixo do pico).
+
+\textbf{(5) Aliasing com $F_s$ menor (contraprova).}
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$F_s$ & pico do filtro digital & frequência do pico & razão vs. analógico\\
+\midrule
+$40$ kHz & $-55{,}895$ dB & $5999{,}94$ Hz & $1{,}008$\\
+$20$ kHz & $-55{,}827$ dB & $5999{,}65$ Hz & $1{,}016$\\
+$15$ kHz & $-55{,}777$ dB & $5999{,}10$ Hz ($0{,}8\pi$) & $1{,}022$\\
+$12$ kHz & $-49{,}829$ dB & $6000{,}00$ Hz (Nyquist) & $\mathbf{2{,}026}$\\
+$8$ kHz  & $-55{,}624$ dB & $2000{,}20$ Hz (dobra) & $1{,}040$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{(6) Desafio de reflexão.} $H_a(s)=\frac{s}{s+2000\pi}$:
+\[
+  h_a(t)=\delta(t)-2000\pi e^{-2000\pi t}u(t)\ \Rightarrow\
+  H(z)=\frac{(T_s-T_s2000\pi)-T_s\alpha z^{-1}}{1-\alpha z^{-1}},\
+  \alpha=0{,}8546359992,
+\]
+\[
+  |H(1)|=1{,}080570\ (+0{,}6731\ \text{dB}),\qquad
+  |H(-1)|=0{,}084671\ (-21{,}4453\ \text{dB}).
+\]
+Ganho decrescente $\Rightarrow$ o passa-altas virou \textbf{passa-baixas}.
+Razões: (i) $|H_a(j\Omega)|\to1$ em HF, logo as réplicas da identidade de
+Poisson não decaem e a série diverge (nenhum $F_s$ conserta); (ii) zeros não
+mapeiam ($s=0\not\to z=1$); (iii) sobra um passa-baixas de 1ª ordem somado a
+$T_s\delta[n]$. Solução: transformação bilinear com pré-deformação.
+
+\subsection*{B.3 Verificações automáticas do projeto}
+
+O script \texttt{src/verificacao.py} checa 23 resultados por caminhos
+independentes (SymPy, resíduos, TDFT/FFT, mapeamento de polos, dobramento em
+Nyquist). Rodar:
+\begin{center}
+\texttt{python src/verificacao.py}\quad$\Rightarrow$\quad
+\texttt{TODAS AS VERIFICACOES PASSARAM (23/23)}
+\end{center}
+
+\begin{center}
+\fcolorbox{azulPDS}{cinzaClaro}{\parbox{0.93\textwidth}{\small
+\textbf{Figuras do projeto} (todas em \texttt{figuras/}):
+\texttt{fig01} $h_a(t)$ e amostras; \texttt{fig02} $h[n]$ do filtro digital;
+\texttt{fig03} magnitude analógico $\times$ digital ($40$ e $15$ kHz);
+\texttt{fig04} mecanismo do aliasing (réplicas); \texttt{fig05} polos e zeros;
+\texttt{fig06} falha no passa-altas; \texttt{fig07} erro de aliasing
+$\times$ $F_s$.}}
+\end{center}

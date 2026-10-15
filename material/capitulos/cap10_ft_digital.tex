@@ -1,0 +1,110 @@
+% =============================================================================
+\section{Função de transferência digital, polos/zeros e estabilidade}\label{sec:ftdig}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+Para um sistema LTI discreto causal descrito por equação de diferenças,
+\[
+  H(z)=\frac{B(z)}{A(z)}
+  =\frac{b_0+b_1z^{-1}+\cdots+b_Mz^{-M}}{1+a_1z^{-1}+\cdots+a_Nz^{-N}} .
+\]
+A \textbf{resposta em frequência} é $H(e^{j\omega})$, isto é, $H(z)$ avaliada
+no \textbf{círculo unitário} ($z=e^{j\omega}$, $\omega$ em rad/amostra,
+$0\le\omega\le\pi$). Relação com a frequência física:
+\[
+  \omega=2\pi\frac{f}{F_s}\quad\Longleftrightarrow\quad
+  f=\frac{\omega}{2\pi}F_s;\qquad \omega=0\ (\text{DC}),\quad
+  \omega=\pi\ \bigl(f=F_s/2\bigr),\quad
+  \omega=2\pi f_0T_s=\omega_0 .
+\]
+
+\begin{teo}[estabilidade]
+Um sistema IIR causal é BIBO estável $\iff$ \textbf{todos os polos} de $H(z)$
+estão dentro do círculo unitário ($|p_i|<1$). Zeros podem estar em qualquer
+lugar; polos no eixo real negativo dão oscilação em $F_s/2$; polos complexos
+$re^{\pm j\theta}$ produzem ressonância em $\omega=\theta$ com seletividade
+controlada por $r$ ($r\to1$: banda estreita).
+\end{teo}
+
+\paragraph{Relações úteis.} Para um polo $z_0=re^{j\theta}$, a resposta em
+frequência tem pico em $\omega\approx\theta$ e banda de $-3$ dB
+aproximadamente $\Delta\omega\approx2(1-r)$ (para $r$ próximo de 1). Ganho em
+DC: $H(1)=\frac{\sum b_m}{\sum a_k}$ (avaliar com $z=1$); em Nyquist:
+$z=-1$ (sinais alternados $(-1)^n$).
+
+\ideia{Comparação com o analógico (Capítulo~\ref{sec:laplace}):
+polo analógico $s=p\ \leftrightarrow$ polo digital $z=e^{pT_s}$;
+semiplano esquerdo $\leftrightarrow$ interior do círculo unitário;
+eixo $j\Omega\ \leftrightarrow$ círculo unitário. É essa correspondência que
+a invariância ao impulso usa (Capítulo~\ref{sec:invimp}) — e ela vale para os
+\emph{polos}, não para os zeros.}
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 10.1
+\exer{Para $H(z)=\dfrac{1-0{,}5z^{-1}}{1-0{,}9z^{-1}}$: calcule $|H|$ em DC e
+em Nyquist, localize polo e zero e classifique o filtro.}
+
+\textbf{Solução.} Com $z=1$ ($\omega=0$) e $z=-1$ ($\omega=\pi$):
+\[
+  |H(1)|=\frac{|1-0{,}5|}{|1-0{,}9|}=\frac{0{,}5}{0{,}1}=5
+  \ \Rightarrow\ 13{,}9794\ \text{dB},
+\]
+\[
+  |H(-1)|=\frac{|1+0{,}5|}{|1+0{,}9|}=\frac{1{,}5}{1{,}9}=0{,}789474
+  \ \Rightarrow\ -2{,}0532\ \text{dB}.
+\]
+Zero em $z=0{,}5$, polo em $z=0{,}9$ ($|z|<1$: estável). Como o ganho cai de
+$5$ para $0{,}79$, é um \textbf{passa-baixas} com banda estreita
+($r=0{,}9$ próximo de 1).
+
+\resp{$|H|_{\text{DC}}=5$ ($13{,}98$ dB), $|H|_{\text{Nyq}}=0{,}7895$
+($-2{,}05$ dB); zero $0{,}5$, polo $0{,}9$; passa-baixas estável.}
+
+% ---------------------------------------------------------------- 10.2
+\exer{\textbf{(Desafio 07)} $A(z)=1-1{,}2z^{-1}+0{,}61z^{-2}-0{,}105z^{-3}$.
+Determine os polos e conclua sobre a estabilidade do filtro $1/A(z)$.}
+
+\textbf{Solução.} Multiplicando por $z^3$:
+\[
+  z^3A(z)\big|_{z^3}=z^3-1{,}2z^2+0{,}61z-0{,}105 .
+\]
+Raízes (obtidas numericamente):
+\[
+  z_{1,2}=0{,}440295\pm j\,0{,}367248,\qquad z_3=0{,}319411,
+\]
+\[
+  |z_{1,2}|=0{,}57335,\qquad |z_3|=0{,}319411 .
+\]
+Todos os módulos são menores que 1 $\Rightarrow$ filtro \textbf{estável}
+(equivalentemente, os coeficientes de reflexão $|k_m|<1$ da estrutura em
+grade — Capítulo~\ref{sec:estr}).
+
+\resp{Polos $0{,}440295\pm j0{,}367248$ ($|z|=0{,}57335$) e $0{,}319411$
+($|z|=0{,}3194$); estável.}
+
+% ---------------------------------------------------------------- 10.3
+\exer{\textbf{(o filtro do desafio)}
+$H(z)=\dfrac{2{,}5\times10^{-5}-1{,}4747557\times10^{-5}z^{-1}}
+{1-1{,}166426294z^{-1}+0{,}9844147634z^{-2}}$.
+Calcule $|H|$ em $\omega=0$, $\omega=0{,}3\pi$ e $\omega=\pi$, localize os
+polos e determine a frequência de pico.}
+
+\textbf{Solução.} Avaliando o polinômio (em potências de $z^{-1}$):
+\[
+  \begin{array}{c|c|c}
+    \omega & |H(e^{j\omega})| & \text{dB}\\ \hline
+    0\ (\text{DC})      & 1{,}2533725398\times10^{-5} & -98{,}04\\
+    0{,}3\pi\ (\text{frequência de projeto}) & 1{,}6040862640\times10^{-3} & -55{,}90\\
+    \pi\ (\text{Nyquist}) & 1{,}2614903901\times10^{-5} & -97{,}98
+  \end{array}
+\]
+Polos: $z=0{,}992176780\,e^{\pm j0{,}29999\pi}$; $r=0{,}99218$ e
+$\theta=0{,}29999\pi\Rightarrow$ ressonância em
+$f=\theta F_s/2\pi=5999{,}79$ Hz; zero em $z=0{,}58990$. A banda de $-3$ dB
+medida é $100{,}02$ Hz (coerente com $f_0/Q=6000/60=100$ Hz).
+
+\resp{$|H|$ em $\omega=0,3\pi, \pi$ vale $1{,}25337\times10^{-5}$,
+$\mathbf{1{,}6040863\times10^{-3}}$ e $1{,}26149\times10^{-5}$;
+polos $0{,}99218e^{\pm j0{,}3\pi}$ (estável, banda estreita).}

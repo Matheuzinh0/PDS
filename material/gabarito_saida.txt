@@ -1,0 +1,203 @@
+
+==============================================================================
+[1] Sinais continuos
+==============================================================================
+1.1 A=3.0, f=100.0 Hz, T=0.010000 s = 10 ms, potencia media P=A^2/2=4.5000 W
+1.2 energia = 1/(2a) = 0.250000 J
+1.3 f1=2 Hz, f2=3 Hz -> razao 3/2 racional -> T0 = 1/f0 com f0 = mdc(2,3) = 1 Hz
+    periodo fundamental T0 = 1.0000 s; P = 2^2/2 + 3^2/2 = 6.5000 W
+
+==============================================================================
+[2] Convolucao continua / SLIT
+==============================================================================
+2.1 y(t) = (1/3)(1-e^-3t)u(t); y(inf) = 0.333333
+2.2 y(t) = tri(t) = 1-|t| em |t|<1 -> amostras: [-0.5  0.   0.5  1.   0.5  0.  -0.5]
+2.3 integral |h| = 1/2 = 0.500000 -> BIBO estavel (anti-causal)
+
+==============================================================================
+[3] Transformada de Laplace
+==============================================================================
+3.1 L{e^{-2t}cos(3t)u(t)} = (s+2)/((s+2)^2+9)  [pode-se conferir ponto a ponto]
+    conferencia em s=j: 0.175000+0.025000j
+3.2 A=1.500000 (em s=-1), B=-0.500000 (em s=-3) -> x(t)=(1.5e^-t -0.5e^-3t)u(t)
+3.3 polos s=-1 e s=-2: parte real negativa -> H(s) causal e estavel
+
+==============================================================================
+[4] Filtros analogicos de 2a ordem
+==============================================================================
+4.1 wn=1000 rad/s, zeta=0.1 -> sigma=100.0000, wd=994.9874 rad/s
+    pico em wr=989.9495 rad/s (157.5554 Hz), |H|max=5.025189 = 14.0230 dB ; 1/(2zeta)=5.000
+    banda -3 dB = 2*zeta*wn = 200.0000 rad/s = 31.830989 Hz
+4.2 DESAFIO: wn=37699.111843 rad/s (fn=6000.0000 Hz), zeta=0.0083333333, Q=60.0000
+    sigma=314.159265 rad/s, wd=37697.802823 rad/s (fd=5999.7917 Hz)
+    |Ha(j*wn)| = 1/(2*zeta*wn) = 1/(200*pi) = 1.5915494309e-03
+    pico exato em wr=wn*sqrt(1-2z^2)=37696.4938 rad/s, |H|max=1.5916046959e-03
+
+==============================================================================
+[6] Amostragem e aliasing
+==============================================================================
+6.1 f=  200 Hz, Fs=4000 Hz, Fs/2=2000 Hz -> aparente  200.00 Hz
+6.1 f=  600 Hz, Fs=4000 Hz, Fs/2=2000 Hz -> aparente  600.00 Hz
+6.1 f= 1300 Hz, Fs=4000 Hz, Fs/2=2000 Hz -> aparente 1300.00 Hz
+6.1 f= 2000 Hz, Fs=4000 Hz, Fs/2=2000 Hz -> aparente 2000.00 Hz
+6.1 f= 3000 Hz, Fs=4000 Hz, Fs/2=2000 Hz -> aparente 1000.00 Hz
+    (600 Hz -> 600; 1300 -> 1300-4000 = -2700 -> 1300; 2000 -> 2000 (Nyquist); 3000 -> 1000)
+6.2 decimacao por M=4 (Fs'=1000, Nyquist 500):
+    200 Hz -> aparente 200 Hz
+    600 Hz -> aparente 400 Hz
+    1300 Hz -> aparente 300 Hz
+6.3 Fs=15 kHz, f=9 kHz -> aparente 6.000 kHz (=15-9=6 kHz); f=6 kHz -> 6.000 kHz
+    Fs=12 kHz, f=6 kHz -> 6.000 kHz (exatamente em Nyquist)
+
+==============================================================================
+[7] Reconstrucao, ZOH e identidade de Poisson
+==============================================================================
+7.1 ZOH: |H(jw)| = Ts*sinc(f/Fs); em f=Fs/2: sinc(0.5)=sin(pi/2)/(pi/2)=0.636620 = -3.9224 dB
+    em f=0.4*Fs: sinc(0.4)=0.756827 = -2.4201 dB
+    w=0.00pi: exato=1.05083319e-03+0.000e+00j  poisson+Ts/2=1.05083307e-03-8.665e-21j  (sem correcao: 1.00083307e-03)
+    w=0.20pi: exato=7.55544146e-05-1.500e-04j  poisson+Ts/2=7.55542880e-05-1.500e-04j  (sem correcao: 2.55542880e-05)
+    w=0.50pi: exato=5.49833997e-05-4.975e-05j  poisson+Ts/2=5.49832731e-05-4.975e-05j  (sem correcao: 4.98327310e-06)
+    w=0.90pi: exato=5.25604203e-05-7.899e-06j  poisson+Ts/2=5.25602937e-05-7.903e-06j  (sem correcao: 2.56029367e-06)
+    diferenca media (sem correcao - exato) = -5.00001266e-05  (== -Ts/2 = -5.00000000e-05)
+
+==============================================================================
+[8] Sistemas discretos
+==============================================================================
+8.2 h=(1/2)^n u[n]: degrau y[n] = 2-(1/2)^n -> [1.       1.5      1.75     1.875    1.9375   1.96875  1.984375 1.992188]
+8.3 h=2^n u[n]: soma diverge (2^n) -> instavel; h=(1/2)^|n|: soma total = 3.000000 (=3)
+
+==============================================================================
+[9] Transformada Z
+==============================================================================
+9.2 x[n] = 2(0.5)^n - (0.25)^n -> [1.         0.75       0.4375     0.234375   0.12109375 0.06152344]
+    conferencia x[0]=1 (numerador e denominador de mesma ordem em z)
+
+==============================================================================
+[10] Funcao de transferencia digital
+==============================================================================
+10.1 H(z)=(1-0.5z^-1)/(1-0.9z^-1) em DC: |H|=5.000000 = 13.9794 dB
+10.1 H(z)=(1-0.5z^-1)/(1-0.9z^-1) em Nyquist: |H|=0.789474 = -2.0532 dB
+     polo z=0.9000, zero z=0.5000, ganho maximo em w=0 (filtro passa-baixas)
+10.2 raizes de A(z)=1-1.2z^-1+0.61z^-2-0.105z^-3: [0.440295+0.367248j 0.440295-0.367248j 0.319411+0.j      ]
+     |z| = [0.57335  0.57335  0.319411] -> todas < 1 : ESTAVEL (k3=+0.105)
+10.3 DESAFIO |H| em DC         = 1.2533725398e-05 ( -98.0384 dB)
+10.3 DESAFIO |H| em w0=0.3pi   = 1.6040862640e-03 ( -55.8954 dB)
+10.3 DESAFIO |H| em Nyquist    = 1.2614903901e-05 ( -97.9823 dB)
+
+==============================================================================
+[11] DFT, leakage e janelas
+==============================================================================
+11.1 retangular N=64: |X[0]|=64.0000, |X[1]|=0.0e+00, |X[N/2]|=0.000e+00
+11.1b senoide de 1.5 ciclos em N=64: pico no bin k=2 (freq. real 1.5 ciclos); |X[k]|=23.2708, |X[k-1]|=16.3445, |X[k+1]|=9.0603  -> leakage
+11.2 Fs=1000 Hz, N=1000 -> df = 1 Hz; dois tons com 10 Hz de separacao precisam df <= 10 Hz -> N >= 100
+    retangular : 1o lobo lateral =  -13.25 dB, largura do lobo principal = 0.03076 ciclos/amostra = 2.00 bins de uma DFT de 65 pontos
+    Hamming    : 1o lobo lateral =  -43.59 dB, largura do lobo principal = 0.06369 ciclos/amostra = 4.14 bins de uma DFT de 65 pontos
+    Hann       : 1o lobo lateral =  -31.47 dB, largura do lobo principal = 0.06250 ciclos/amostra = 4.06 bins de uma DFT de 65 pontos
+    Blackman   : 1o lobo lateral =  -58.11 dB, largura do lobo principal = 0.09375 ciclos/amostra = 6.09 bins de uma DFT de 65 pontos
+
+==============================================================================
+[12] Fase, atraso de grupo, passa-tudo, fase minima
+==============================================================================
+    conferencia numerica da derivada (diferenças finitas):
+      w=0.00pi: analitico = 5.00000000, numerico = 5.00000000
+      w=0.50pi: analitico = -0.28151744, numerico = -0.28151744
+      w=1.00pi: analitico = -0.17374517, numerico = -0.17374517
+      w=0.20pi: analitico = -0.41939564, numerico = -0.41939562
+12.1 Hc=(1-0.4z^-1)/(1-0.85z^-1): tau(0.00pi) = 5.00000000 amostras
+     passa-tudo(a=0.85) em omega=0.00pi: 12.33333333 amostras
+12.1 Hc=(1-0.4z^-1)/(1-0.85z^-1): tau(0.50pi) = -0.28151744 amostras
+     passa-tudo(a=0.85) em omega=0.50pi: 0.16110305 amostras
+12.1 Hc=(1-0.4z^-1)/(1-0.85z^-1): tau(1.00pi) = -0.17374517 amostras
+     passa-tudo(a=0.85) em omega=1.00pi: 0.08108108 amostras
+12.2 alvo tau_tot(0) = 10.0: tau_c(0) = 5.000000 -> (1+a)/(1-a) = 5.000000 -> a = 0.6666666667 (= 2/3)
+     conferencia: tau_tot(0) = 10.0000000000
+     em w=pi/2: tau_c = -0.281517; maximo alcancavel do passa-tudo = 1.000000 -> maximo total = 0.718483 < 3.5 (IMPOSSIVEL)
+12.3 H(z): zeros = [ 2.  -0.3] (2 e -0.3), polos = [ 0.7 -0.6] (0.7 e -0.6)
+     h[0..3] = [ 1.    -1.6   -0.34  -0.706]   soma(h) = -2.4443166000 (H(1) = -4)
+     Hmin (K=2): b=[ 2.  -0.4 -0.3]
+     hmin[0..3] = [ 2.    -0.2    0.52  -0.032]
+     Hap: b=[ 0.5 -1. ], a=[1,-0.5]; |Hap| = [1. 1. 1. 1. 1.]
+     h == conv(2*hmin, hap)? erro = 2.220e-16
+     E3(H) = 3.6756000000   E3(Hmin) = 4.3104000000
+     energia total (Parseval): H = 4.36835474 , Hmin = 4.36835474  -> iguais, pois |Hmin| = |H| (Hap e passa-tudo)
+     fracao da energia nos 3 primeiros: H = 0.841415, Hmin = 0.986733
+
+==============================================================================/home/matheus/Documentos/PDS/desafio_08_invariancia_ao_impulso/material/gabarito_numerico.py:319: RuntimeWarning: invalid value encountered in divide
+  hd = np.sin(wc * (n - M / 2)) / (np.pi * (n - M / 2))
+/home/matheus/Documentos/PDS/desafio_08_invariancia_ao_impulso/material/gabarito_numerico.py:348: RuntimeWarning: invalid value encountered in divide
+  hd_k = np.sin(0.35 * (nk - Mk / 2)) / (np.pi * (nk - Mk / 2))
+
+[13] FIR: janelamento e tipos
+==============================================================================
+13.1 passa-baixas Hamming wc=0.3pi, M=20 (21 coeficientes), atraso M/2 = 10.0
+     h[0..5] = [ 0.          0.00293325  0.00635175  0.00378865 -0.01240622 -0.03437747]
+     h[10] (centro) = 0.30000000 ; soma = 1.00148267 (ganho DC)
+     soma alternada (ganho em pi) = -1.059e-03
+13.2 Tipo II (M=21, simetrico, h[n]=h[M-n]): h[0..2]=[-0.00110103  0.00152779  0.00591536] h[10]=0.28753440 h[11]=0.28753440 simetria h[10]-h[11]=0.00e+00
+     soma alternada (= H(pi)) = 0.000e+00 -> ZERO exato: Tipo II nao serve para passa-altas
+13.3 Kaiser: dw=0.6283185307 rad/amostra, beta=4.551260, M~29.253863 -> M=30 (ordem), N=31 taps
+     atraso = M/2 = 15.0 amostras
+     h[0..3] = [-0.00099663 -0.00218313 -0.003658   -0.00497522] ; ganho DC = 1.004532
+
+==============================================================================
+[14] Quantizacao de coeficientes de IIR
+==============================================================================
+14.1 polos ideais: [0.874972+0.284296j 0.874972-0.284296j 0.671751+0.671751j 0.671751-0.671751j 0.302837+0.932035j 0.302837-0.932035j]
+     denominador (forma direta): a1..a6 = [-3.6991201832  6.9339730023 -8.1706448593  6.3467631101 -3.0715525712  0.7336265104]
+     passo de quantizacao (12 bits, [-8,8]) = 0.0039062500
+     quantizado: [-3.6953125   6.93359375 -8.16796875  6.34375    -3.0703125   0.73046875]
+     raizes quantizadas: [0.30246816+0.93092097j 0.30246816-0.93092097j 0.68403154+0.67965562j 0.68403154-0.67965562j 0.86115655+0.27992435j
+ 0.86115655-0.27992435j]
+     |z| = [0.97882626 0.97882626 0.9642774  0.9642774  0.90550994 0.90550994] -> max = 0.97882626  INSTAVEL? False
+14.3 cascata SOS (cada secao quantizada independentemente):
+     r=0.92 theta=0.10pi: a1=-1.7499439900->-1.7460937500, a2=0.8464000000->0.8437500000, polos |z|=[0.91855865 0.91855865]
+     r=0.95 theta=0.25pi: a1=-1.3435028843->-1.3398437500, a2=0.9025000000->0.9023437500, polos |z|=[0.94991776 0.94991776]
+     r=0.98 theta=0.40pi: a1=-0.6056733090->-0.6054687500, a2=0.9604000000->0.9570312500, polos |z|=[0.97827974 0.97827974]
+     max |polo| na cascata = 0.97827974 (< 1 -> ESTAVEL)
+14.4 varredura do numero de bits (faixa [-8,+8]) - max |polo|:
+     bits   passo        Forma Direta        Cascata (SOS)
+       6   0.25000000   1.246715 INSTAVEL   0.866025 estavel
+       7   0.12500000   1.107362 INSTAVEL   0.935414 estavel
+       8   0.06250000   1.002093 INSTAVEL   0.968246 estavel
+       9   0.03125000   0.997348 estavel    0.968246 estavel
+      10   0.01562500   0.988678 estavel    0.976281 estavel
+      11   0.00781250   0.981731 estavel    0.976281 estavel
+      12   0.00390625   0.978826 estavel    0.978280 estavel
+      14   0.00097656   0.980059 estavel    0.979776 estavel
+      16   0.00024414   0.980045 estavel    0.979901 estavel
+     forma direta: estavel para todo b >= 9 bits (em 8 bits: max|z| = 1.002093)
+     cascata SOS: estavel para todo b >= 6 bits (em 5 bits: max|z| = 1.000000)
+
+==============================================================================
+[15] Invariancia ao impulso
+==============================================================================
+15.1 ha=e^-1000t u(t), Ts=0.1 ms: r=exp(-aTs)=0.9048374180, H(z)=1.0e-04/(1-0.904837z^-1); ganho DC = 0.0010508332 (analitico 1/a = 0.0010000000)
+15.2 DESAFIO: r=0.992176780293, theta=0.942445070585 rad = 0.299989583152pi
+     b0=2.500000000000e-05 b1=-1.474755715063e-05 a1=-1.166426294332e+00 a2=9.844147633517e-01
+15.3 passa-altas a=2000pi: alpha=0.8546359992, |H(1)| = -1.080570 (0.6731 dB)
+     |H(-1)| = 0.084671 (-21.4453 dB)  [confere com desafio08.py: 0.084671 / -21.4453 dB]
+
+==============================================================================
+[16] Transformacao bilinear e pre-deformacao
+==============================================================================
+16.1 f=   5.0 Hz -> Omega = 2*Fs*tan(pi*f/Fs) = 31.418511 rad/s   (sem warp: 2*pi*f = 31.415927)
+16.1 f=  20.0 Hz -> Omega = 2*Fs*tan(pi*f/Fs) = 125.829335 rad/s   (sem warp: 2*pi*f = 125.663706)
+16.1 f= 150.0 Hz -> Omega = 2*Fs*tan(pi*f/Fs) = 1019.050899 rad/s   (sem warp: 2*pi*f = 942.477796)
+16.1 f= 300.0 Hz -> Omega = 2*Fs*tan(pi*f/Fs) = 2752.763841 rad/s   (sem warp: 2*pi*f = 1884.955592)
+16.1 f= 100.0 Hz -> Omega = 2*Fs*tan(pi*f/Fs) = 649.839392 rad/s   (sem warp: 2*pi*f = 628.318531)
+16.2 bilinear 1a ordem (fc=100 Hz, Fs=1000): b=[0.2452372753 0.2452372753], a=[ 1.           -0.5095254495]
+     |H| em DC             = 1.0000000000 (   0.0000 dB)
+     |H| em -3dB nominal   = 0.7071067812 (  -3.0103 dB)
+     |H| em Nyquist        = 0.0000000000 (-334.0249 dB)
+16.3 pre-warp: Op1=125.8293, Op2=1019.0509, Os1=31.4185, Os2=2752.7638 rad/s
+     Bp=0.0069659672, Bs=0.0314650993
+     eps_p=0.508847, eps_s=31.606961
+     Bs/Bp = 4.516975
+     N >= log10(eps_s/eps_p)/log10(Bs/Bp) = 2.738340 -> N = 3 -> para passa-faixa: 2N = 6 pólos
+     centro geometrico do passa-faixa Om0 = 358.087275 rad/s (56.9914 Hz)
+     Om_stop equivalentes = [4.53395  3.029688] rad/s (usar o MENOR)
+     N >= log10(eps_s/eps_p)/log10(Omega_s,min) = 2.731545 -> N=3
+
+==============================================================================
+FIM DO GABARITO
+==============================================================================

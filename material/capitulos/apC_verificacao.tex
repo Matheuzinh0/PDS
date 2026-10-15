@@ -1,0 +1,93 @@
+% =============================================================================
+\section{Como conferir os números deste material}\label{ap:verif}
+% =============================================================================
+
+Todo valor numérico deste documento foi produzido por script, não ``à mão''.
+Isso significa que você pode (e deve) reconferir tudo:
+
+\begin{center}
+\texttt{python material/gabarito\_numerico.py > material/gabarito\_saida.txt}
+\end{center}
+
+\subsection*{C.1 O que é conferido, por assunto}
+
+\begin{center}
+\small
+\begin{tabular}{p{1.5cm}p{8.4cm}}
+\toprule
+Capítulo & Verificação executada pelo script\\ \midrule
+1 & período, potência e energia\\
+2 & convolução contínua (valores de $\operatorname{tri}$), somabilidade\\
+3 & frações parciais e avaliação de $X(s)$ em $s=j$\\
+4 & polos, pico, banda de $-3$ dB (fórmula e varredura numérica)\\
+5 & sinc/nulos, Parseval\\
+6 & tabela de frequências aparentes ($f\bmod F_s$ com dobramento)\\
+7 & ZOH em $F_s/2$ e $0{,}4F_s$; identidade de Poisson com e sem
+    $T_sh_a(0^+)/2$\\
+8 & resposta ao degrau, somas de BIBO\\
+9 & inversa da transformada $Z$ (valores de $x[n]$)\\
+10 & $|H|$ em DC/Nyquist/$0{,}3\pi$; raízes do polinômio do Desafio 07\\
+11 & DFT do retângulo, leakage, lóbulos das janelas\\
+12 & atraso de grupo analítico $\times$ derivada numérica; decomposição
+    fase mínima (convolução conferida)\\
+13 & coeficientes janelados, $H(\pi)$ do Tipo II, projeto de Kaiser\\
+14 & denominador expandido, quantização e \textbf{varredura de bits}\\
+15 & coeficientes por invariância ao impulso; passa-altas degenerado\\
+16 & pré-deformação, projeto bilinear, ordem Butterworth\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{C.2 Checagens que você mesmo pode fazer em 5 minutos}
+
+\begin{enumerate}
+  \item \textbf{Soma dos coeficientes} dá o ganho em DC;
+        $\sum(-1)^nb_n$ dá o ganho em Nyquist. Use para detectar erros de
+        sinal.
+  \item \textbf{Polos por raízes}: em Octave/Python,
+        \texttt{roots([1 a1 a2 ...])} diretamente do denominador.
+  \item \textbf{$h[n]$ por filtragem}: alimente $\delta[n]$ em
+        \texttt{filter(b,a,...)} e compare com $T_sh_a(nT_s)$.
+  \item \textbf{Teste de fase linear}: verifique $h[n]=h[M-n]$; a resposta em
+        fase deve ser exatamente $-\omega M/2$.
+  \item \textbf{Critério de estabilidade}: calcule \texttt{max(abs(roots(a)))}
+        e exija $<1$.
+\end{enumerate}
+
+\subsection*{C.3 Convenções usadas no documento}
+
+\begin{itemize}
+  \item Magnetude em dB: $20\log_{10}|H|$; ganho de potência seria
+        $10\log_{10}$.
+  \item $\omega$ em rad/amostra; $\Omega$ em rad/s; $f$ em Hz.
+  \item Vírgula decimal (padrão pt-BR) e ponto para separar milhares quando
+        necessário.
+  \item Unidades do ganho do protótipo analógico: $|H_a|$ de um passa-faixa
+        com numerador $s$ tem dimensão $1/(\text{rad/s})$ — motivo pelo qual
+        valores como $1{,}59\times10^{-3}$ são corretos e não ``ganho
+        baixo''.
+  \item Todos os valores foram calculados com \texttt{numpy 2.2.6} /
+        \texttt{scipy 1.15.3} em precisão dupla.
+\end{itemize}
+
+\subsection*{C.4 Erros comuns (``pegadinhas'') que este material cobre}
+
+\begin{center}
+\small
+\begin{tabular}{p{6.7cm}p{8.3cm}}
+\toprule
+Pegadinha & Onde está tratada\\ \midrule
+Confundir $\omega_d$ com $\omega_n$ & Exercícios 4.2 e 15.2\\
+Achar que $f_d=f_n$ & Exercício 4.2 ($5999{,}79$ vs $6000$ Hz)\\
+Achar que a invariância ao impulso mapeia zeros & Exercício 15.3\\
+Esquecer o termo $T_sh_a(0^+)/2$ & Exercícios 7.2 e 7.3\\
+Usar $b_0+b_1$ em vez de $b_0-b_1$ para $|H(-1)|$ & Exercício 15.3\\
+Projetar Tipo II para passa-altas & Exercício 13.2\\
+Quantizar a forma direta de ordem alta & Exercícios 14.2 e 14.3\\
+Achar que aumentar $M$ melhora a rejeição da janela retangular & Seção 13 e
+Exercício 13.1\\
+Achar que $\sum_n h[n]$ deve ser exatamente zero & Exercício 7.3\\
+Esquecer a pré-deformação e achar que ``deu quase igual'' & Exercício 16.1\\
+\bottomrule
+\end{tabular}
+\end{center}

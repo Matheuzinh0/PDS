@@ -1,0 +1,143 @@
+% =============================================================================
+\section{FIR de fase linear: tipos I--IV, janelamento e Kaiser}\label{sec:fir}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\paragraph{Fase linear.} Se $h[n]$ tem simetria em torno de $M/2$
+\[
+  h[n]=h[M-n]\ (\text{simétrica})\qquad\text{ou}\qquad
+  h[n]=-h[M-n]\ (\text{anti-simétrica}),
+\]
+então
+\[
+  H(e^{j\omega})=A(\omega)\,e^{-j\omega M/2}
+  \ \Rightarrow\ \tau(\omega)=\frac{M}{2}\ \text{constante} .
+\]
+Um filtro FIR com fase linear é o único jeito de ter \textbf{atraso inteiro ou
+meio-inteiro constante} sem distorcer o envelope. Filtros IIR só conseguem
+fase aproximadamente linear (usando passa-tudo em cascata).
+
+\begin{center}
+\begin{tabular}{clll}
+\toprule
+Tipo & $M$ & Simetria & Restrições obrigatórias\\
+\midrule
+I   & par    & $h[n]=h[M-n]$    & nenhuma (serve para tudo)\\
+II  & ímpar & $h[n]=h[M-n]$    & $H(\pi)=0$ (não serve p/ passa-altas)\\
+III & par    & $h[n]=-h[M-n]$   & $H(0)=H(\pi)=0$ (não serve p/ passa-baixas nem altas)\\
+IV  & ímpar & $h[n]=-h[M-n]$   & $H(0)=0$ (não serve p/ passa-baixas)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Por quê:} para o Tipo II, emparelhando $n$ com $M-n$ (paridade oposta,
+pois $M$ é ímpar),
+\[
+  H(\pi)=\sum_{n=0}^{M}h[n](-1)^{n}=0
+  \quad\text{exatamente, pois }(-1)^{n}+(-1)^{M-n}=(-1)^n(1+(-1)^M)=0 .
+\]
+
+\paragraph{Janelamento e o fenômeno de Gibbs.} O filtro ideal tem
+$h_d[n]=\frac{\operatorname{sen}(\omega_c(n-M/2))}{\pi(n-M/2)}$
+(infinito e não-causal). Truncar equivale a multiplicar por uma janela
+retangular, o que produz oscilações na banda de passagem e limita a atenuação
+da banda de rejeição a $\approx-21$ dB (independente de $M$ — é o lóbulo
+lateral da janela, não a ordem, que manda). Janelas suaves (Hamming, Hann,
+Kaiser) trocam lóbulo principal mais largo por lóbulos laterais muito
+menores.
+
+\paragraph{Janela de Kaiser (a única ``sintonizável'').}
+\[
+  w[n]=\frac{I_0\!\left[\beta\sqrt{1-\left(\frac{2n}{M}-1\right)^{2}}\right]}
+  {I_0(\beta)},\qquad
+  \beta=\begin{cases}
+    0{,}1102(A-8{,}7), & A>50\ \text{dB}\\
+    0{,}5842(A-21)^{0{,}4}+0{,}07886(A-21), & 21\le A\le50\\
+    0, & A<21
+  \end{cases}
+\]
+e a ordem necessária é
+\[
+  \boxed{\ M\approx\frac{A-8}{2{,}285\,\Delta\omega}\ }
+\]
+com $\Delta\omega$ a largura de transição em \textbf{rad/amostra}
+($\Delta\omega=2\pi\Delta f/F_s$). O atraso é sempre $M/2$ amostras.
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 13.1
+\exer{Projete um passa-baixas FIR de fase linear com $\omega_c=0{,}3\pi$,
+$M=20$ (21 coeficientes) usando janela de Hamming. Dê os coeficientes
+principais e o atraso.}
+
+\textbf{Solução.} $h_d[n]=\frac{\operatorname{sen}(0{,}3\pi(n-10))}{\pi(n-10)}$,
+$h_d[10]=0{,}3$; multiplicando pela Hamming:
+\[
+  h[n]=h_d[n]\cdot\left[0{,}54-0{,}46\cos\!\Bigl(\frac{2\pi n}{20}\Bigr)\right].
+\]
+Primeiros coeficientes (calculados):
+\[
+  h[0..5]=\{\,0{,}0;\ 0{,}00293325;\ 0{,}00635175;\ 0{,}00378865;\
+  -0{,}01240622;\ -0{,}03437747\,\},
+\]
+$h[10]=0{,}30000000$, e a soma (ganho DC) é
+$\sum h[n]=1{,}00148267$. Simetria: $h[n]=h[20-n]$.
+Atraso de grupo: $\tau=M/2=10$ amostras (fase linear exata). Ganho em
+$\omega=\pi$ (soma alternada): $-1{,}06\times10^{-3}\approx0$ — praticamente o
+esperado para um bom passa-baixas.
+
+\resp{21 coeficientes simétricos com $h[10]=0{,}3$ e ganho DC $\approx1$;
+atraso constante de $10$ amostras.}
+
+% ---------------------------------------------------------------- 13.2
+\exer{\textbf{(Desafio 05)} Com $M=21$ (Tipo II) e a mesma especificação do
+exercício anterior, mostre numericamente que $H(\pi)=0$. Explique por que esse
+filtro \emph{não} pode ser usado como passa-altas.}
+
+\textbf{Solução.} Neste caso $M$ é \textbf{ímpar} e não existe amostra no
+ponto de simetria ($M/2=10{,}5$):
+\[
+  h[10]=h[11]=0{,}28753440,\qquad h[n]=h[21-n] .
+\]
+A resposta em $\omega=\pi$ é a soma alternada:
+\[
+  H(\pi)=\sum_{n=0}^{21}h[n](-1)^{n}=0 \quad\text{(exatamente)},
+\]
+porque em cada par $(n,\,21-n)$ as paridades são opostas e os valores iguais,
+logo $h[n](-1)^n+h[21-n](-1)^{21-n}=h[n](-1)^n(1-1)=0$.
+Um passa-altas \emph{precisa} de ganho alto em $\omega=\pi$; como o Tipo II
+tem um \textbf{zero obrigatório} em $\omega=\pi$, seria necessário um Tipo I
+($M$ par) ou um Tipo IV com transformação adequada.
+
+\resp{$H(\pi)=0$ exato para o Tipo II (zero forçado em $z=-1$); para
+passa-altas use Tipo I ou III (com $M$ par, por exemplo $M=32$).}
+
+% ---------------------------------------------------------------- 13.3
+\exer{Projete por Kaiser um passa-baixas com $F_s=1000$ Hz, banda passante até
+$100$ Hz, banda de rejeição a partir de $200$ Hz e atenuação $A=50$ dB:
+calcule $\beta$, a ordem $M$ e o atraso.}
+
+\textbf{Solução.} Largura de transição:
+\[
+  \Delta f=200-100=100\ \text{Hz}\ \Longrightarrow\
+  \Delta\omega=2\pi\frac{100}{1000}=0{,}6283185307\ \text{rad/amostra}.
+\]
+Como $A=50$ dB ($>50$), usa-se $\beta=0{,}1102(A-8{,}7)$:
+\[
+  \beta=0{,}1102\,(50-8{,}7)=4{,}551260 .
+\]
+Ordem:
+\[
+  M\approx\frac{A-8}{2{,}285\Delta\omega}
+   =\frac{42}{2{,}285\cdot0{,}6283185307}
+   =29{,}253863\ \Longrightarrow\ \boxed{M=30}\ (31\ \text{coeficientes}).
+\]
+Corte em $\omega_c=0{,}35\pi$ (\emph{entre} $100$ e $200$ Hz: $f_c=175$ Hz —
+qualquer ponto da faixa de transição serve, pois $\beta$ e $M$ dependem
+apenas de $\Delta\omega$). Atraso: $M/2=15$ amostras; o ganho DC calculado
+é $1{,}004532$ (o projeto de janela erra ligeiramente o ganho — normaliza-se
+dividindo pela soma, se necessário).
+
+\resp{$\beta=4{,}5513$, $M=30$ (31 coeficientes), $\Delta\omega=0{,}6283$,
+atraso $15$ amostras, ganho DC $\approx1{,}005$.}

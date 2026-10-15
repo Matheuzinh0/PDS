@@ -1,0 +1,97 @@
+% =============================================================================
+\section{SLIT contínuos: convolução e estabilidade}\label{sec:slit}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+Para um SLIT contínuo, a saída é completamente determinada pela
+\textbf{resposta ao impulso} $h(t)=\mathcal{T}\{\delta(t)\}$:
+\[
+  y(t)=x(t)*h(t)=\int_{-\infty}^{\infty}x(\tau)h(t-\tau)\,d\tau
+      =\int_{-\infty}^{\infty}h(\tau)x(t-\tau)\,d\tau .
+\]
+A convolução é \textbf{comutativa}, \textbf{associativa} e
+\textbf{distributiva} — é isso que permite trocar a ordem de blocos em série e
+em paralelo:
+\[
+  \text{série: }h_1*h_2, \qquad \text{paralelo: }h_1+h_2 .
+\]
+
+\paragraph{Causalidade e estabilidade (BIBO).}
+\[
+  \text{causal}\iff h(t)=0\ \text{para }t<0, \qquad
+  \text{BIBO estável}\iff \int_{-\infty}^{\infty}|h(t)|\,dt<\infty .
+\]
+A segunda condição é consequência de: se $|x(t)|\le B$, então
+$|y(t)|\le B\int|h|$; e se $\int|h|=\infty$ existe entrada limitada que faz a
+saída divergir.
+
+\ideia{Convolução no tempo será \emph{multiplicação} em Laplace e em $z$
+(Capítulos~\ref{sec:laplace} e \ref{sec:z}). Cerca de metade dos problemas de
+PDS se resolve escolhendo o domínio mais confortável e voltando.}
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 2.1
+\exer{Calcule $y(t)=u(t)*e^{-3t}u(t)$.}
+
+\textbf{Solução.} Como ambos os sinais são causais, os limites ficam de $0$ a
+$t$:
+\[
+  y(t)=\int_{0}^{t}1\cdot e^{-3(t-\tau)}\,d\tau
+       =e^{-3t}\int_0^t e^{3\tau}\,d\tau
+       =e^{-3t}\left[\frac{e^{3\tau}}{3}\right]_0^t
+       =\frac{1-e^{-3t}}{3},\qquad t\ge 0 .
+\]
+Fora de $t\ge 0$ a saída é nula $\Rightarrow$ $y(t)=\frac{1}{3}(1-e^{-3t})u(t)$.
+
+\resp{$y(t)=\frac{1}{3}\bigl(1-e^{-3t}\bigr)u(t)$, com $y(\infty)=\frac{1}{3}$:
+a resposta ao degrau de um sistema de 1ª ordem tende ao ganho DC $1/a$.}
+
+% ---------------------------------------------------------------- 2.2
+\exer{Calcule $y(t)=\operatorname{rect}(t)*\operatorname{rect}(t)$ e diga o
+que acontece com o suporte (largura) do resultado.}
+
+\textbf{Solução.} A convolução de dois pulsos retangulares de largura $T_1$ e
+$T_2$ tem suporte $T_1+T_2$ e formato trapezoidal (triangular no caso
+igual). Aqui $T_1=T_2=1$:
+\[
+  y(t)=\operatorname{tri}(t)=
+  \begin{cases}1-|t|,&|t|<1\\0,&|t|\ge 1.\end{cases}
+\]
+Conferindo em pontos (calculados numericamente):
+\[
+  t=-1{,}5\to 0{,}0;\quad t=-0{,}5\to 0{,}5;\quad t=0\to 1{,}0;\quad
+  t=0{,}5\to 0{,}5;\quad t=1{,}5\to 0 .
+\]
+
+\resp{$y(t)=\operatorname{tri}(t)$; largura final $=T_1+T_2=2$. A convolução
+\emph{suaviza} e \emph{alarga}: é o primeiro sinal de que todo filtro tem
+memória.}
+
+% ---------------------------------------------------------------- 2.3
+\exer{Estude a estabilidade BIBO de (a) $h_1(t)=e^{-t}u(t)$,
+(b) $h_2(t)=e^{2t}u(-t)$ e (c) $h_3(t)=u(t)-u(t-1)$; diga também quais são
+causais.}
+
+\textbf{Solução.} Basta calcular $\int|h|$:
+\[
+  \text{(a)}\ \int_0^\infty e^{-t}dt=1<\infty\ \Rightarrow\ \text{estável, causal};
+\]
+\[
+  \text{(b)}\ \int_{-\infty}^0 e^{2t}dt=\frac{1}{2}<\infty\ \Rightarrow\
+  \text{estável, porém \textbf{anti-causal}};
+\]
+\[
+  \text{(c)}\ \int_0^1 1\,dt=1<\infty\ \Rightarrow\ \text{estável, causal}.
+\]
+
+\resp{(a) estável/causal; (b) estável/anti-causal; (c) estável/causal. Note
+que (b) mostra que ``estável'' \emph{não} implica ``causal'' — critério que
+reaparece no plano $s$: a ROC precisa conter o eixo $j\Omega$.}
+
+\begin{obs}
+Sinais anti-causais não são implementáveis em tempo real, mas aparecem muito
+em \emph{equalização} de canais (Desafio 04) e na decomposição de fase
+mínima (Capítulo~\ref{sec:fase}).
+\end{obs}

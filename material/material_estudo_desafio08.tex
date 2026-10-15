@@ -1,0 +1,133 @@
+% =============================================================================
+%  MATERIAL DE ESTUDO - DESAFIO 08 (PDS 2026.2)
+%  Discretização de Filtros IIR por Invariância ao Impulso e
+%  Análise de Aliasing Espectral
+%
+%  Revisão dos conceitos necessários, de Sinais e Sistemas até PDS,
+%  com 3 exercícios resolvidos por assunto (48 exercícios no total).
+%
+%  Compilar:
+%      pdflatex material_estudo_desafio08.tex     (2x)
+%
+%  Pacotes exigidos (repositório TinyTeX desta máquina):
+%      beamer pgf translator booktabs babel-portugues lm
+%      amsmath amsfonts graphics tools geometry hyperref xcolor amscls
+%
+%  Todos os números deste documento foram calculados e conferidos em
+%  material/gabarito_numerico.py  ->  material/gabarito_saida.txt
+% =============================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\geometry{a4paper,top=2.4cm,bottom=2.4cm,left=2.4cm,right=2.4cm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\definecolor{azulPDS}{RGB}{31,78,121}
+\definecolor{vermPDS}{RGB}{192,0,0}
+\definecolor{verdePDS}{RGB}{46,139,87}
+\definecolor{cinzaClaro}{RGB}{245,246,248}
+\definecolor{amareloClaro}{RGB}{255,250,235}
+\definecolor{azulClaro}{RGB}{238,244,250}
+
+\hypersetup{colorlinks=true,linkcolor=azulPDS,urlcolor=azulPDS,
+            citecolor=azulPDS,pdftitle={Material de Estudo - Desafio 08 - PDS 2026.2}}
+
+% sumario apenas com as secoes (e subsecoes), sem os \paragraph
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{2}
+
+\graphicspath{{../figuras/}}
+
+% ------------------------------------------------------------------ ambientes
+\newtheorem{teo}{Teorema}[section]
+\newtheorem{prop}[teo]{Propriedade}
+\newtheorem{exem}[teo]{Exemplo}
+\theoremstyle{definition}
+\newtheorem{defi}[teo]{Definição}
+\theoremstyle{remark}
+\newtheorem*{obs}{Observação}
+
+\newcounter{ex}[section]
+\newcommand{\exer}[1]{%
+  \refstepcounter{ex}%
+  \medskip\noindent\textbf{\color{azulPDS}Exercício \thesection.\theex\ --- #1}%
+  \par\nopagebreak\smallskip}
+
+\newcommand{\resp}[1]{%
+  \begin{center}%
+    \fcolorbox{vermPDS}{amareloClaro}{\parbox{0.94\textwidth}{\small
+    \textbf{\color{vermPDS}Resposta:} #1}}%
+  \end{center}}
+
+\newcommand{\ideia}[1]{%
+  \begin{center}%
+    \fcolorbox{azulPDS}{azulClaro}{\parbox{0.94\textwidth}{\small
+    \textbf{\color{azulPDS}Ideia central:} #1}}%
+  \end{center}}
+
+\newcommand{\jornal}[1]{\textcolor{cinzaClaro}{#1}}
+
+\title{\vspace{-1.5cm}\textbf{\color{azulPDS}Material de Estudo --- Desafio 08}\\[2mm]
+\large Discretização de Filtros IIR por Invariância ao Impulso e\\
+Análise de Aliasing Espectral}
+\author{PDS 2026.2 --- Departamento de Eletrônica e Sistemas (UFPE)\\
+\small Revisão de Sinais e Sistemas $\rightarrow$ Processamento Digital de Sinais\\
+\small \emph{48 exercícios resolvidos (3 por assunto)}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\vspace{-1.5cm}
+
+\begin{center}
+\fcolorbox{azulPDS}{cinzaClaro}{\parbox{0.92\textwidth}{\small
+\textbf{Como usar este material.} Cada capítulo tem (i) a teoria mínima
+necessária, com as equações que você precisa saber \emph{de cor}, e (ii)
+\textbf{três exercícios resolvidos} no mesmo estilo dos desafios da disciplina.
+Todos os números foram obtidos por script (\texttt{gabarito\_numerico.py}), com a
+saída em \texttt{gabarito\_saida.txt}: se um valor divergir do seu cálculo,
+desconfie do seu cálculo. Os capítulos 4, 6, 7, 10, 12, 14, 15 e 16 são
+diretamente o ``DNA'' do Desafio 08.}}
+\end{center}
+
+\tableofcontents
+\newpage
+
+\newcommand{\capitulo}[1]{%
+  \IfFileExists{#1}{\input{#1}}{%
+  \section*{[Capítulo ainda não escrito]}}}
+
+\capitulo{capitulos/cap01_sinais_sistemas}
+\capitulo{capitulos/cap02_slit_convolucao}
+\capitulo{capitulos/cap03_laplace}
+\capitulo{capitulos/cap04_segunda_ordem}
+\capitulo{capitulos/cap05_fourier}
+\capitulo{capitulos/cap06_amostragem}
+\capitulo{capitulos/cap07_reconstrucao_poisson}
+\capitulo{capitulos/cap08_discretos_lti}
+\capitulo{capitulos/cap09_transformada_z}
+\capitulo{capitulos/cap10_ft_digital}
+\capitulo{capitulos/cap11_dft_janelas}
+\capitulo{capitulos/cap12_fase_grupo}
+\capitulo{capitulos/cap13_fir_fase_linear}
+\capitulo{capitulos/cap14_estruturas_quantizacao}
+\capitulo{capitulos/cap15_invariancia_impulso}
+\capitulo{capitulos/cap16_bilinear}
+
+\appendix
+\capitulo{capitulos/apA_formulario}
+\capitulo{capitulos/apB_desafio08_resolvido}
+\capitulo{capitulos/apC_verificacao}
+
+\end{document}

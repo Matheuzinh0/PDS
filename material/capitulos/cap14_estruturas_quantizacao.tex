@@ -1,0 +1,149 @@
+% =============================================================================
+\section{Estruturas IIR e quantização de coeficientes}\label{sec:estr}
+% =============================================================================
+
+\subsection*{Teoria mínima}
+
+\paragraph{Três estruturas equivalentes (mesma $H(z)$, comportamentos
+diferentes em ponto fixo).}
+\begin{itemize}
+  \item \textbf{Forma Direta I:} implementa
+        $H(z)=\frac{B(z)}{A(z)}$ com dois atrasos por polo; os coeficientes
+        $a_k$ entram \emph{expandidos}
+        $A(z)=1+a_1z^{-1}+\cdots+a_Nz^{-N}$.
+  \item \textbf{Cascata (SOS):} $H(z)=\prod_i H_i(z)$ com cada $H_i$ de 2ª
+        ordem (polos complexos conjugados juntos). Cada seção é quantizada
+        \emph{independentemente}.
+  \item \textbf{Paralela / grade (lattice):} soma de frações parciais /
+        coeficientes de reflexão $k_m$ — cada $|k_m|<1$ garante estabilidade
+        (usada no Desafio 07 e na codificação de voz).
+\end{itemize}
+
+\paragraph{Sensibilidade de raízes (por que a cascata salva).} Seja
+$A(z)=\prod_i(z-p_i)$. Derivando $\sum_k a_kp_i^{-k}=0$ em relação a $a_k$:
+\[
+  \frac{\partial p_i}{\partial a_k}
+  =-\frac{p_i^{\,N-k}}{\prod_{j\neq i}(p_i-p_j)} .
+\]
+O denominador contém \textbf{todos os pares de distâncias entre polos}. Logo:
+(i) polos \emph{próximos entre si} (cascata de 6ª ordem em Forma Direta com
+polos agrupados em 3 pares) têm sensibilidade enorme; (ii) a cascata separa o
+produto em fatores de 2ª ordem, onde só \emph{um} par aparece no denominador —
+sensibilidade de 2ª ordem, não de 6ª.
+
+\paragraph{Quantização em ponto fixo.} Com $b$ bits na faixa
+$[-L,+L]$, o passo é
+\[
+  q=\frac{2L}{2^{b}},\qquad
+  \hat{a}_k=\left\lfloor\frac{a_k}{q}\right\rfloor q\ (\text{truncamento}),
+\]
+e a perturbação máxima por coeficiente é $q$. O erro relativo importa:
+coeficientes pequenos (como $a_2^{2}$ de uma seção com $r=0{,}92$,
+$0{,}846$) sofrem muito mais que coeficientes grandes.
+
+\ideia{Em hardware de precisão fixa: \textbf{quantize sempre cada seção SOS
+separadamente}. A diferença aparece de forma dramática quando $q$ cresce
+(poucos bits) — veja a varredura do Exercício 14.2.}
+
+\subsection*{Exercícios resolvidos}
+
+% ---------------------------------------------------------------- 14.1
+\exer{\textbf{(Desafio 06)} Um filtro de 6ª ordem tem polos
+$r_ie^{\pm j\theta_i}$ com $(r,\theta)=(0{,}92,0{,}1\pi),\ (0{,}95,0{,}25\pi),\
+(0{,}98,0{,}4\pi)$. Escreva o denominador na Forma Direta I e calcule
+$a_1,\dots,a_6$.}
+
+\textbf{Solução.} $A(z)=\prod_i(1-2r_i\cos\theta_i z^{-1}+r_i^2z^{-2})$.
+As raízes complexas são
+\[
+  0{,}874972\pm j0{,}284296;\quad 0{,}671751\pm j0{,}671751;\quad
+  0{,}302837\pm j0{,}932035 .
+\]
+Expandindo o produto (valores exatos obtidos numericamente):
+\[
+  \begin{array}{ll}
+    a_1=-3{,}6991201832, & a_2=+6{,}9339730023,\\
+    a_3=-8{,}1706448593, & a_4=+6{,}3467631101,\\
+    a_5=-3{,}0715525712, & a_6=+0{,}7336265104 .
+  \end{array}
+\]
+Note os coeficientes grandes e com sinais alternados: é exatamente esse
+``espalhamento'' que amplifica o efeito da quantização.
+
+\resp{$a_1=-3{,}69912$, $a_2=6{,}93397$, $a_3=-8{,}17064$, $a_4=6{,}34676$,
+$a_5=-3{,}07155$, $a_6=0{,}73363$.}
+
+% ---------------------------------------------------------------- 14.2
+\exer{Quantize os coeficientes de 14.1 em ponto fixo com 12 bits na faixa
+$[-8,+8]$ (truncamento), recalcule os polos e discuta a estabilidade. Repita
+para 8 bits e explicite a diferença entre Forma Direta e Cascata.}
+
+\textbf{Solução.} Passo de quantização:
+\[
+  q=\frac{2\cdot8}{2^{12}}=0{,}00390625 .
+\]
+Coeficientes quantizados:
+\[
+  \hat{a}_1..\hat{a}_6=\{-3{,}6953125;\ 6{,}93359375;\ -8{,}16796875;\
+  6{,}34375;\ -3{,}0703125;\ 0{,}73046875\}.
+\]
+Polos resultantes:
+\[
+  |z|=\{0{,}97882626,\ 0{,}97882626,\ 0{,}96427740,\ 0{,}96427740,\
+  0{,}90550994,\ 0{,}90550994\},
+\]
+todos $<1$: com \textbf{12 bits} a Forma Direta ainda é estável, mas o polo
+projetado em $0{,}98$ caiu para $0{,}97883$ (variação de $1{,}2\times10^{-3}$).
+
+A fragilidade aparece com menos bits. Varredura de $b$ bits (passo
+$q=16/2^{b}$), mostrando $\max_i|p_i|$:
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$b$ & $q$ & Forma Direta & Cascata (SOS)\\
+\midrule
+6  & 0{,}25000000 & $1{,}246715$ \textbf{instável} & $0{,}866025$ ok\\
+7  & 0{,}12500000 & $1{,}107362$ \textbf{instável} & $0{,}935414$ ok\\
+8  & 0{,}06250000 & $1{,}002093$ \textbf{instável} & $0{,}968246$ ok\\
+9  & 0{,}03125000 & $0{,}997348$ ok & $0{,}968246$ ok\\
+10 & 0{,}01562500 & $0{,}988678$ ok & $0{,}976281$ ok\\
+12 & 0{,}00390625 & $0{,}978826$ ok & $0{,}978280$ ok\\
+\bottomrule
+\end{tabular}
+\end{center}
+Resumo quantitativo: a Forma Direta é estável para todo $b\ge9$ bits (em
+$8$ bits já estoura, $\max|p|=1{,}002093$); a Cascata é estável para todo
+$b\ge6$ bits.
+
+\resp{Com 12 bits: Forma Direta estável ($\max|p|=0{,}978826$) e Cascata
+estável ($0{,}978280$) — ambas servem. Com 8 bits: Forma Direta
+\textbf{instável} ($\max|p|=1{,}0021$), Cascata ainda estável ($0{,}9682$).
+Ou seja, o ganho da estrutura em cascata é de \textbf{2--3 bits de precisão}.}
+
+% ---------------------------------------------------------------- 14.3
+\exer{Quantize as três seções SOS com os mesmos 12 bits e verifique os polos
+de cada seção.}
+
+\textbf{Solução.} Cada seção tem
+$H_i(z)=\dfrac{1}{1-2r_i\cos\theta_iz^{-1}+r_i^2z^{-2}}$:
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+$r$ & $\theta$ & $a_1$ & $\hat{a}_1$ & $a_2$ & $\hat{a}_2$\\
+\midrule
+$0{,}92$ & $0{,}10\pi$ & $-1{,}7499439900$ & $-1{,}7460937500$ & $0{,}8464000000$ & $0{,}8437500000$\\
+$0{,}95$ & $0{,}25\pi$ & $-1{,}3435028843$ & $-1{,}3398437500$ & $0{,}9025000000$ & $0{,}9023437500$\\
+$0{,}98$ & $0{,}40\pi$ & $-0{,}6056733090$ & $-0{,}6054687500$ & $0{,}9604000000$ & $0{,}9570312500$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Polos de cada seção quantizada:
+\[
+  |z|=\{\,0{,}91855865,\ 0{,}94991776,\ 0{,}97827974\,\},
+\]
+todos dentro do círculo unitário. A seção mais crítica (projeto $r=0{,}98$)
+desloca o polo para $0{,}978280$ — mesmo assim estável.
+
+\resp{$\max|p_i|=0{,}97827974<1$: a cascata com 12 bits mantém a
+estabilidade e o erro de posição dos polos é da ordem de $q=0{,}0039$ em cada
+seção, \emph{não} amplificado pela ordem do filtro.}
