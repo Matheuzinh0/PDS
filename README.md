@@ -64,12 +64,6 @@ wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
 export PATH="$HOME/.TinyTeX/bin/x86_64-linux:$PATH"
 tlmgr install beamer pgf translator booktabs babel-portugues
 ```
-
-Pacotes LaTeX exigidos pelo `.tex`: `beamer, pgf, translator, lm` (fornece
-`lmodern`), `booktabs, babel-portugues, amsmath, amsfonts, graphicx`.
-As figuras são incluídas de `../figuras/*.pdf` (vetoriais) — então **regenere as
-figuras** (`python src/desafio08.py`) antes de compilar.
-
 ### 2.2 Material de estudo (LaTeX)
 
 ```bash
